@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preuv' — Certifiez vos échanges</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Preuv'</span>
+    </div>
+    <nav class="topnav">
+      <button class="nav-link" data-goto="creer">Nouveau dossier</button>
+      <button class="nav-link" data-goto="dossiers">Mes dossiers</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero wrap">
+    <div class="hero-text">
+      <p class="eyebrow">Preuve numérique · Bénin &amp; Afrique de l'Ouest</p>
+      <h1>Un accord conclu sur WhatsApp mérite une preuve aussi solide qu'un contrat signé.</h1>
+      <p class="lede">Preuv' capture, horodate et certifie l'intégrité de vos échanges — ventes, locations, prêts, services — pour que vous ayez un dossier exploitable en cas de litige.</p>
+      <button class="btn btn-primary" data-goto="creer">Créer mon premier dossier</button>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="doc-card">
+        <div class="doc-line w-70"></div>
+        <div class="doc-line w-90"></div>
+        <div class="doc-line w-40"></div>
+        <div class="doc-hash">8f3a…c02e</div>
+        <div class="seal" id="heroSeal">
+          <svg viewBox="0 0 100 100" class="seal-svg">
+            <circle cx="50" cy="50" r="46" />
+            <circle cx="50" cy="50" r="38" />
+            <text x="50" y="46" text-anchor="middle" class="seal-text">CERTIFIÉ</text>
+            <text x="50" y="62" text-anchor="middle" class="seal-text seal-text-sm">PREUV'</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="creer" class="panel wrap">
+    <h2>Nouveau dossier</h2>
+    <p class="panel-sub">Décrivez l'accord, puis ajoutez ce qui en fait la preuve — une capture, un reçu, une note vocale, ou simplement le texte de l'échange.</p>
+
+    <form id="dossierForm" class="form-card">
+      <label class="field">
+        <span class="field-label">Titre du dossier</span>
+        <input type="text" id="titre" placeholder="Ex. Vente de 2 sacs de riz — M. Koudjo" required>
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field-label">Type d'accord</span>
+          <select id="type">
+            <option>Vente</option>
+            <option>Location</option>
+            <option>Prêt / dette</option>
+            <option>Service</option>
+            <option>Autre</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">Montant concerné (FCFA)</span>
+          <input type="number" id="montant" placeholder="Ex. 25000">
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Résumé de l'accord</span>
+        <textarea id="texte" rows="4" placeholder="Ex. Le 09 août 2026, accord verbal confirmé par message : vente de 2 sacs de riz à 12 500 FCFA le sac, paiement par MoMo, livraison le lendemain."></textarea>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Pièce jointe (capture, reçu, audio…)</span>
+        <input type="file" id="fichier">
+      </label>
+
+      <button type="submit" class="btn btn-primary">Générer la certification</button>
+    </form>
+
+    <div id="resultat" class="result-card hidden">
+      <div class="result-seal-wrap">
+        <div class="seal seal-small">
+          <svg viewBox="0 0 100 100" class="seal-svg">
+            <circle cx="50" cy="50" r="46" />
+            <circle cx="50" cy="50" r="38" />
+            <text x="50" y="46" text-anchor="middle" class="seal-text">CERTIFIÉ</text>
+            <text x="50" y="62" text-anchor="middle" class="seal-text seal-text-sm">PREUV'</text>
+          </svg>
+        </div>
+      </div>
+      <h3 id="resTitre">—</h3>
+      <dl class="result-grid">
+        <div><dt>Horodatage</dt><dd id="resDate">—</dd></div>
+        <div><dt>Empreinte numérique (SHA-256)</dt><dd id="resHash" class="mono">—</dd></div>
+        <div><dt>Force du dossier</dt><dd id="resForce">—</dd></div>
+      </dl>
+      <p id="resConseil" class="conseil"></p>
+      <div class="result-actions">
+        <button class="btn btn-ghost" id="btnImprimer">Exporter en PDF</button>
+        <button class="btn btn-ghost" id="btnNouveau">Créer un autre dossier</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="dossiers" class="panel wrap">
+    <h2>Mes dossiers</h2>
+    <p class="panel-sub">Stockés uniquement sur cet appareil pour l'instant — la synchronisation en ligne arrive dans une prochaine version.</p>
+    <div id="listeDossiers" class="dossiers-list">
+      <p class="empty">Aucun dossier pour le moment. Créez-en un pour le voir apparaître ici.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p>Preuv' — prototype de démonstration. Ne constitue pas un avis juridique.</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
