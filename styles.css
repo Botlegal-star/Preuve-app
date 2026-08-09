@@ -264,10 +264,76 @@ textarea{resize:vertical;font-family:var(--font-body);}
 .dossier-item .di-title{font-weight:600;font-size:14px;}
 .dossier-item .di-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
 .dossier-item .di-hash{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);}
+.badge-confirme{
+  display:inline-block;
+  font-size:11px;
+  font-weight:600;
+  color:var(--sage);
+  background:rgba(63,107,84,0.12);
+  padding:2px 8px;
+  border-radius:999px;
+  margin-left:6px;
+}
 
 /* Footer */
 .footer{padding:32px 24px;border-top:1px solid var(--line);}
 .footer p{font-size:12px;color:var(--ink-soft);margin:0;}
+
+/* Share block */
+.share-block{
+  margin-top:28px;
+  padding-top:24px;
+  border-top:1px dashed var(--line);
+  text-align:left;
+}
+.share-label{font-size:13px;font-weight:600;margin:0 0 10px;}
+.share-row{display:flex;gap:8px;flex-wrap:wrap;}
+.share-input{
+  flex:1;
+  min-width:0;
+  font-family:var(--font-mono);
+  font-size:12px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--paper);
+  color:var(--ink-soft);
+}
+.btn-small{padding:10px 18px;font-size:13px;white-space:nowrap;}
+.share-hint{font-size:12px;color:var(--ink-soft);margin:10px 0 0;}
+
+/* Overlay views (confirmation / vérification) */
+.overlay-view{
+  min-height:100vh;
+  background:var(--paper);
+  padding:48px 0 64px;
+}
+.overlay-view.hidden{display:none;}
+.overlay-wrap{max-width:620px;}
+.brand-center{justify-content:center;margin-bottom:40px;}
+.confirm-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:36px 32px;
+  margin-bottom:24px;
+  text-align:center;
+}
+.confirm-card h2{
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:24px;
+  margin:6px 0 24px;
+}
+.confirm-card .result-grid{text-align:left;}
+.form-card-inline{
+  box-shadow:none;
+  border:none;
+  padding:24px 0 0;
+  margin:0;
+  text-align:left;
+}
+.confirm-card .btn{margin-top:6px;}
 
 /* Responsive */
 @media (max-width:760px){

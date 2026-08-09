@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Preuv' — Certifiez vos échanges</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<header class="topbar">
+<header class="topbar" id="topbarNormal">
   <div class="wrap topbar-inner">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true"></span>
@@ -23,7 +24,97 @@
   </div>
 </header>
 
-<main>
+<div id="vueConfirmation" class="overlay-view hidden">
+  <div class="wrap overlay-wrap">
+    <div class="brand brand-center">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Preuv'</span>
+    </div>
+    <div class="confirm-card">
+      <p class="eyebrow">Dossier à confirmer</p>
+      <h2 id="cfTitre">—</h2>
+      <dl class="result-grid">
+        <div><dt>Type d'accord</dt><dd id="cfType">—</dd></div>
+        <div><dt>Montant concerné</dt><dd id="cfMontant">—</dd></div>
+        <div><dt>Résumé</dt><dd id="cfTexte">—</dd></div>
+        <div><dt>Certifié le</dt><dd id="cfDate">—</dd></div>
+        <div><dt>Empreinte numérique</dt><dd id="cfHash" class="mono">—</dd></div>
+      </dl>
+      <p class="conseil">Vérifiez que ces informations correspondent bien à votre accord avant de confirmer. Une fois confirmé, un certificat horodaté sera généré à votre nom.</p>
+
+      <form id="confirmForm" class="form-card form-card-inline">
+        <label class="field">
+          <span class="field-label">Votre nom</span>
+          <input type="text" id="cfNom" placeholder="Ex. Adjovi Marcel" required>
+        </label>
+        <label class="field">
+          <span class="field-label">Votre téléphone</span>
+          <input type="text" id="cfTel" placeholder="Ex. 97 00 00 00" required>
+        </label>
+        <button type="submit" class="btn btn-primary">Je confirme cet accord</button>
+      </form>
+    </div>
+
+    <div id="cfResultat" class="confirm-card hidden">
+      <div class="result-seal-wrap">
+        <div class="seal seal-small">
+          <svg viewBox="0 0 100 100" class="seal-svg">
+            <circle cx="50" cy="50" r="46" />
+            <circle cx="50" cy="50" r="38" />
+            <text x="50" y="46" text-anchor="middle" class="seal-text">CONFIRMÉ</text>
+            <text x="50" y="62" text-anchor="middle" class="seal-text seal-text-sm">PREUV'</text>
+          </svg>
+        </div>
+      </div>
+      <h3>Confirmation enregistrée</h3>
+      <p class="conseil">Renvoyez ce lien à la personne qui vous a envoyé le dossier — il lui permettra de vérifier et d'ajouter votre confirmation à son dossier.</p>
+      <div class="share-block">
+        <div class="share-row">
+          <input type="text" id="cfShareLink" class="share-input" readonly>
+          <button class="btn btn-primary btn-small" id="btnCopierConfirm">Copier le lien</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost" id="btnImprimerConfirm">Exporter en PDF</button>
+    </div>
+  </div>
+</div>
+
+<div id="vueVerification" class="overlay-view hidden">
+  <div class="wrap overlay-wrap">
+    <div class="brand brand-center">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Preuv'</span>
+    </div>
+    <div class="confirm-card" id="vfCarteValide">
+      <div class="result-seal-wrap">
+        <div class="seal seal-small">
+          <svg viewBox="0 0 100 100" class="seal-svg">
+            <circle cx="50" cy="50" r="46" />
+            <circle cx="50" cy="50" r="38" />
+            <text x="50" y="46" text-anchor="middle" class="seal-text">VÉRIFIÉ</text>
+            <text x="50" y="62" text-anchor="middle" class="seal-text seal-text-sm">PREUV'</text>
+          </svg>
+        </div>
+      </div>
+      <h3>Confirmation vérifiée ✓</h3>
+      <dl class="result-grid">
+        <div><dt>Confirmé par</dt><dd id="vfNom">—</dd></div>
+        <div><dt>Téléphone</dt><dd id="vfTel">—</dd></div>
+        <div><dt>Confirmé le</dt><dd id="vfDate">—</dd></div>
+        <div><dt>Empreinte du dossier d'origine</dt><dd id="vfHashOrigine" class="mono">—</dd></div>
+      </dl>
+      <p class="conseil">L'empreinte de cette confirmation correspond exactement à votre dossier d'origine — elle n'a pas été modifiée. Vous avez maintenant une preuve à deux parties.</p>
+      <button class="btn btn-primary" id="btnEnregistrerConfirmation">Enregistrer dans mon dossier</button>
+      <button class="btn btn-ghost" id="btnImprimerVerif">Exporter en PDF</button>
+    </div>
+    <div class="confirm-card hidden" id="vfCarteInvalide">
+      <h3>⚠️ Cette confirmation ne correspond à aucun dossier valide</h3>
+      <p class="conseil weak">Le lien semble corrompu ou a été modifié. Redemandez un nouveau lien à la personne concernée.</p>
+    </div>
+  </div>
+</div>
+
+<main id="mainNormal">
 
   <section class="hero wrap">
     <div class="hero-text">
@@ -108,6 +199,15 @@
         <div><dt>Force du dossier</dt><dd id="resForce">—</dd></div>
       </dl>
       <p id="resConseil" class="conseil"></p>
+      <div class="share-block">
+        <p class="share-label">Envoyer à l'autre partie pour confirmation</p>
+        <div class="share-row">
+          <input type="text" id="shareLink" class="share-input" readonly>
+          <button class="btn btn-primary btn-small" id="btnCopierLien">Copier le lien</button>
+        </div>
+        <p class="share-hint">L'autre partie ouvre ce lien, vérifie les détails, et confirme l'accord de son côté — ça crée une preuve à deux, bien plus solide qu'un dossier créé seul.</p>
+      </div>
+
       <div class="result-actions">
         <button class="btn btn-ghost" id="btnImprimer">Exporter en PDF</button>
         <button class="btn btn-ghost" id="btnNouveau">Créer un autre dossier</button>
@@ -125,7 +225,7 @@
 
 </main>
 
-<footer class="footer">
+<footer class="footer" id="footerNormal">
   <div class="wrap">
     <p>Preuv' — prototype de démonstration. Ne constitue pas un avis juridique.</p>
   </div>
