@@ -178,6 +178,9 @@ form.addEventListener('submit', async (e) => {
   // Préparer le lien de partage pour double signature
   const lien = buildShareLink(dossier);
   document.getElementById('shareLink').value = lien;
+
+  const msgWa = `Bonjour, je vous partage le dossier "${titre}" certifié sur Preuv' pour confirmation : ${lien}`;
+  document.getElementById('btnWhatsappPartage').href = `https://wa.me/?text=${encodeURIComponent(msgWa)}`;
 });
 
 document.getElementById('btnCopierLien').addEventListener('click', (e) => {
@@ -238,6 +241,9 @@ async function initVuesExternes(){
 
       const lien = buildConfirmLink(confirmation);
       document.getElementById('cfShareLink').value = lien;
+
+      const msgWa = `Bonjour, j'ai confirmé l'accord "${dossier.titre}" sur Preuv'. Voici le certificat de confirmation : ${lien}`;
+      document.getElementById('btnWhatsappConfirm').href = `https://wa.me/?text=${encodeURIComponent(msgWa)}`;
 
       document.getElementById('btnCopierConfirm').addEventListener('click', (e2) => {
         copyToClipboard(lien, e2.target);

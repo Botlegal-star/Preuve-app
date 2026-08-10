@@ -67,11 +67,12 @@
         </div>
       </div>
       <h3>Confirmation enregistrée</h3>
-      <p class="conseil">Renvoyez ce lien à la personne qui vous a envoyé le dossier — il lui permettra de vérifier et d'ajouter votre confirmation à son dossier.</p>
+      <p class="conseil">Renvoyez ceci à la personne qui vous a envoyé le dossier — en un clic via WhatsApp, ou en copiant le lien.</p>
       <div class="share-block">
-        <div class="share-row">
+        <a href="#" id="btnWhatsappConfirm" class="btn btn-whatsapp" target="_blank" rel="noopener">Envoyer via WhatsApp</a>
+        <div class="share-row" style="margin-top:12px;">
           <input type="text" id="cfShareLink" class="share-input" readonly>
-          <button class="btn btn-primary btn-small" id="btnCopierConfirm">Copier le lien</button>
+          <button class="btn btn-ghost btn-small" id="btnCopierConfirm">Copier le lien</button>
         </div>
       </div>
       <button class="btn btn-ghost" id="btnImprimerConfirm">Exporter en PDF</button>
@@ -118,9 +119,9 @@
 
   <section class="hero wrap">
     <div class="hero-text">
-      <p class="eyebrow">Preuve numérique · Bénin &amp; Afrique de l'Ouest</p>
-      <h1>Un accord conclu sur WhatsApp mérite une preuve aussi solide qu'un contrat signé.</h1>
-      <p class="lede">Preuv' capture, horodate et certifie l'intégrité de vos échanges — ventes, locations, prêts, services — pour que vous ayez un dossier exploitable en cas de litige.</p>
+      <p class="eyebrow">Preuve numérique · Pour tous vos échanges en ligne</p>
+      <h1>Un accord conclu en ligne mérite une preuve aussi solide qu'un contrat signé.</h1>
+      <p class="lede">Preuv' capture, horodate et certifie l'intégrité de vos échanges — messages, ventes en ligne, contrats électroniques, locations, prêts, services — pour que vous ayez un dossier exploitable en cas de litige.</p>
       <button class="btn btn-primary" data-goto="creer">Créer mon premier dossier</button>
     </div>
     <div class="hero-visual" aria-hidden="true">
@@ -201,9 +202,10 @@
       <p id="resConseil" class="conseil"></p>
       <div class="share-block">
         <p class="share-label">Envoyer à l'autre partie pour confirmation</p>
-        <div class="share-row">
+        <a href="#" id="btnWhatsappPartage" class="btn btn-whatsapp" target="_blank" rel="noopener">Envoyer via WhatsApp</a>
+        <div class="share-row" style="margin-top:12px;">
           <input type="text" id="shareLink" class="share-input" readonly>
-          <button class="btn btn-primary btn-small" id="btnCopierLien">Copier le lien</button>
+          <button class="btn btn-ghost btn-small" id="btnCopierLien">Copier le lien</button>
         </div>
         <p class="share-hint">L'autre partie ouvre ce lien, vérifie les détails, et confirme l'accord de son côté — ça crée une preuve à deux, bien plus solide qu'un dossier créé seul.</p>
       </div>

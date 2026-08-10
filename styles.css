@@ -120,6 +120,16 @@ h1{
   color:var(--ink);
 }
 .btn-ghost:hover{border-color:var(--navy);}
+.btn-whatsapp{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:#25D366;
+  color:#fff;
+  text-decoration:none;
+}
+.btn-whatsapp:hover{background:#1fb958;}
 
 /* Hero visual: document card with seal */
 .hero-visual{display:flex;justify-content:center;}
