@@ -146,6 +146,8 @@
     <h2>Nouveau dossier</h2>
     <p class="panel-sub">Décrivez l'accord, puis ajoutez ce qui en fait la preuve — une capture, un reçu, une note vocale, ou simplement le texte de l'échange.</p>
 
+    <p id="editNotice" class="edit-notice hidden">✏️ Vous modifiez un dossier existant — comme le contenu change, une nouvelle empreinte et un nouvel horodatage seront générés, et toute confirmation déjà reçue sera réinitialisée.</p>
+
     <form id="dossierForm" class="form-card">
       <label class="field">
         <span class="field-label">Titre du dossier</span>
@@ -179,7 +181,7 @@
         <input type="file" id="fichier">
       </label>
 
-      <button type="submit" class="btn btn-primary">Générer la certification</button>
+      <button type="submit" class="btn btn-primary" id="btnSubmitForm">Générer la certification</button>
     </form>
 
     <div id="resultat" class="result-card hidden">
@@ -232,6 +234,22 @@
     <p>Preuv' — prototype de démonstration. Ne constitue pas un avis juridique.</p>
   </div>
 </footer>
+
+<div id="printLetterhead" class="print-only">
+  <div class="print-header">
+    <div class="print-brand-block">
+      <span class="print-mark" aria-hidden="true"></span>
+      <span class="print-brand">Preuv'</span>
+    </div>
+    <div class="print-tagline">Certificat de preuve numérique</div>
+  </div>
+</div>
+
+<div id="printFooter" class="print-only">
+  <hr class="print-hr">
+  <p class="print-legal">Ce document atteste de l'existence et de l'intégrité horodatée des informations décrites ci-dessus, telles qu'enregistrées par Preuv' à la date indiquée. Preuv' est un service de certification technique et ne constitue pas un avis juridique ; il ne garantit pas, à lui seul, la validité juridique de l'accord sous-jacent.</p>
+  <p class="print-legal print-meta">Document généré le <span id="printDateGen"></span> — preuv-app.github.io</p>
+</div>
 
 <script src="app.js"></script>
 </body>

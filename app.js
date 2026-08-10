@@ -5,16 +5,42 @@ const STORAGE_KEY = 'preuve_dossiers_v1';
 
 function getDossiers(){
   try{
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    let changed = false;
+    all.forEach(d => { if (!d.id){ d.id = genId(); changed = true; } });
+    if (changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    return all;
   }catch(e){
     return [];
   }
+}
+
+function genId(){
+  return 'd_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
 }
 
 function saveDossier(d){
   const all = getDossiers();
   all.unshift(d);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+}
+
+function updateDossier(id, changes){
+  const all = getDossiers();
+  const idx = all.findIndex(d => d.id === id);
+  if (idx === -1) return null;
+  all[idx] = { ...all[idx], ...changes };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  return all[idx];
+}
+
+function deleteDossier(id){
+  const all = getDossiers().filter(d => d.id !== id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+}
+
+function getDossierById(id){
+  return getDossiers().find(d => d.id === id) || null;
 }
 
 async function hashText(text){
@@ -59,14 +85,54 @@ function renderDossiers(){
   }
   list.innerHTML = all.map(d => `
     <div class="dossier-item">
-      <div>
+      <div class="di-info">
         <div class="di-title">${escapeHtml(d.titre)} ${d.confirmation ? '<span class="badge-confirme">✓ confirmé</span>' : ''}</div>
         <div class="di-meta">${escapeHtml(d.type)} · ${formatDate(new Date(d.date))}${d.confirmation ? ` · confirmé par ${escapeHtml(d.confirmation.nom)}` : ''}</div>
+        <div class="di-hash">${d.hash.slice(0,12)}…</div>
       </div>
-      <div class="di-hash">${d.hash.slice(0,12)}…</div>
+      <div class="di-actions">
+        <button class="di-btn" data-action="voir" data-id="${d.id}">Voir</button>
+        <button class="di-btn" data-action="modifier" data-id="${d.id}">Modifier</button>
+        <button class="di-btn di-btn-danger" data-action="supprimer" data-id="${d.id}">Supprimer</button>
+      </div>
     </div>
   `).join('');
 }
+
+// Actions sur la liste (délégation d'événements)
+document.getElementById('listeDossiers').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const action = btn.dataset.action;
+
+  if (action === 'supprimer'){
+    if (confirm('Supprimer définitivement ce dossier ? Cette action est irréversible.')){
+      deleteDossier(id);
+      renderDossiers();
+    }
+  }
+
+  if (action === 'voir'){
+    const d = getDossierById(id);
+    if (d) afficherResultat(d, { modeEdition:false });
+    document.getElementById('creer').scrollIntoView({ behavior:'smooth' });
+  }
+
+  if (action === 'modifier'){
+    const d = getDossierById(id);
+    if (!d) return;
+    document.getElementById('titre').value = d.titre;
+    document.getElementById('type').value = d.type;
+    document.getElementById('montant').value = d.montant || '';
+    document.getElementById('texte').value = d.texte || '';
+    form.dataset.editingId = id;
+    document.getElementById('btnSubmitForm').textContent = 'Mettre à jour la certification';
+    document.getElementById('editNotice').classList.remove('hidden');
+    document.getElementById('resultat').classList.add('hidden');
+    document.getElementById('creer').scrollIntoView({ behavior:'smooth' });
+  }
+});
 
 function escapeHtml(str){
   const div = document.createElement('div');
@@ -129,38 +195,12 @@ document.querySelectorAll('[data-goto]').forEach(btn => {
   });
 });
 
-// Formulaire
-const form = document.getElementById('dossierForm');
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+function afficherResultat(dossier, { modeEdition } = {}){
+  document.getElementById('resTitre').textContent = dossier.titre || 'Dossier sans titre';
+  document.getElementById('resDate').textContent = formatDate(new Date(dossier.date));
+  document.getElementById('resHash').textContent = dossier.hash;
 
-  const titre = document.getElementById('titre').value.trim();
-  const type = document.getElementById('type').value;
-  const montant = document.getElementById('montant').value;
-  const texte = document.getElementById('texte').value.trim();
-  const fichierInput = document.getElementById('fichier');
-  const fichier = fichierInput.files[0];
-
-  // Construire l'empreinte à partir de tous les éléments du dossier
-  let combined = `${titre}|${type}|${montant}|${texte}|${Date.now()}`;
-  let fileHash = null;
-  if (fichier){
-    fileHash = await hashFile(fichier);
-    combined += `|${fileHash}`;
-  }
-  const hash = await hashText(combined);
-  const date = new Date();
-
-  const force = evaluerForce({ texte, montant, fichier, type });
-
-  const dossier = { titre, type, montant, texte, hash, date: date.toISOString(), fichierNom: fichier ? fichier.name : null };
-  saveDossier(dossier);
-  renderDossiers();
-
-  // Afficher le résultat
-  document.getElementById('resTitre').textContent = titre || 'Dossier sans titre';
-  document.getElementById('resDate').textContent = formatDate(date);
-  document.getElementById('resHash').textContent = hash;
+  const force = evaluerForce({ texte: dossier.texte, montant: dossier.montant, fichier: dossier.fichierNom, type: dossier.type });
   document.getElementById('resForce').textContent = force.niveau;
 
   const conseilEl = document.getElementById('resConseil');
@@ -175,12 +215,55 @@ form.addEventListener('submit', async (e) => {
   document.getElementById('resultat').classList.remove('hidden');
   document.getElementById('resultat').scrollIntoView({ behavior:'smooth', block:'center' });
 
-  // Préparer le lien de partage pour double signature
   const lien = buildShareLink(dossier);
   document.getElementById('shareLink').value = lien;
-
-  const msgWa = `Bonjour, je vous partage le dossier "${titre}" certifié sur Preuv' pour confirmation : ${lien}`;
+  const msgWa = `Bonjour, je vous partage le dossier "${dossier.titre}" certifié sur Preuv' pour confirmation : ${lien}`;
   document.getElementById('btnWhatsappPartage').href = `https://wa.me/?text=${encodeURIComponent(msgWa)}`;
+}
+
+// Formulaire
+const form = document.getElementById('dossierForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const titre = document.getElementById('titre').value.trim();
+  const type = document.getElementById('type').value;
+  const montant = document.getElementById('montant').value;
+  const texte = document.getElementById('texte').value.trim();
+  const fichierInput = document.getElementById('fichier');
+  const fichier = fichierInput.files[0];
+  const editingId = form.dataset.editingId;
+
+  // Construire l'empreinte à partir de tous les éléments du dossier
+  let combined = `${titre}|${type}|${montant}|${texte}|${Date.now()}`;
+  let fileHash = null;
+  if (fichier){
+    fileHash = await hashFile(fichier);
+    combined += `|${fileHash}`;
+  }
+  const hash = await hashText(combined);
+  const date = new Date();
+
+  let dossier;
+  if (editingId){
+    // Modification : le contenu ayant changé, une nouvelle empreinte et un nouvel horodatage
+    // sont générés — toute confirmation précédente devient invalide et est réinitialisée.
+    dossier = updateDossier(editingId, {
+      titre, type, montant, texte, hash,
+      date: date.toISOString(),
+      fichierNom: fichier ? fichier.name : null,
+      confirmation: null
+    });
+    delete form.dataset.editingId;
+    document.getElementById('btnSubmitForm').textContent = 'Générer la certification';
+    document.getElementById('editNotice').classList.add('hidden');
+  } else {
+    dossier = { id: genId(), titre, type, montant, texte, hash, date: date.toISOString(), fichierNom: fichier ? fichier.name : null };
+    saveDossier(dossier);
+  }
+
+  renderDossiers();
+  afficherResultat(dossier);
 });
 
 document.getElementById('btnCopierLien').addEventListener('click', (e) => {
@@ -189,12 +272,20 @@ document.getElementById('btnCopierLien').addEventListener('click', (e) => {
 
 document.getElementById('btnNouveau').addEventListener('click', () => {
   form.reset();
+  delete form.dataset.editingId;
+  document.getElementById('btnSubmitForm').textContent = 'Générer la certification';
+  document.getElementById('editNotice').classList.add('hidden');
   document.getElementById('resultat').classList.add('hidden');
   document.getElementById('creer').scrollIntoView({ behavior:'smooth' });
 });
 
 document.getElementById('btnImprimer').addEventListener('click', () => {
   window.print();
+});
+
+window.addEventListener('beforeprint', () => {
+  const el = document.getElementById('printDateGen');
+  if (el) el.textContent = formatDate(new Date());
 });
 
 renderDossiers();
