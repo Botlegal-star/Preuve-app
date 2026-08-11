@@ -222,12 +222,20 @@ function escapeHtml(str){
 
 function encodePayload(obj){
   const json = JSON.stringify(obj);
+  if (window.LZString){
+    return LZString.compressToEncodedURIComponent(json);
+  }
+  // Repli si la librairie ne charge pas (ex. pas de connexion au CDN)
   const b64 = btoa(unescape(encodeURIComponent(json)));
   return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 
 function decodePayload(str){
   try{
+    if (window.LZString){
+      const json = LZString.decompressFromEncodedURIComponent(str);
+      if (json) return JSON.parse(json);
+    }
     let b64 = str.replace(/-/g,'+').replace(/_/g,'/');
     while (b64.length % 4) b64 += '=';
     const json = decodeURIComponent(escape(atob(b64)));
@@ -239,32 +247,46 @@ function decodePayload(str){
 
 function buildShareLink(dossier){
   const payload = {
-    titre: dossier.titre,
-    type: dossier.type,
-    montant: dossier.montant,
-    texte: dossier.texte,
-    hash: dossier.hash,
-    date: dossier.date
+    t: dossier.titre,
+    y: dossier.type,
+    m: dossier.montant,
+    x: dossier.texte,
+    h: dossier.hash,
+    dt: dossier.date
   };
   const base = location.origin + location.pathname;
   return `${base}?d=${encodePayload(payload)}`;
 }
 
 function buildConfirmLink(confirmation){
+  const payload = {
+    h: confirmation.hashOrigine,
+    t: confirmation.titre,
+    n: confirmation.nom,
+    p: confirmation.tel,
+    s: confirmation.ts2,
+    f: confirmation.confHash
+  };
   const base = location.origin + location.pathname;
-  return `${base}?c=${encodePayload(confirmation)}`;
+  return `${base}?c=${encodePayload(payload)}`;
 }
 
 function buildVerifyLink(dossier){
   const payload = {
-    titre: dossier.titre,
-    type: dossier.type,
-    montant: dossier.montant,
-    texte: dossier.texte,
-    hash: dossier.hash,
-    date: dossier.date,
-    confirmation: dossier.confirmation || null
+    t: dossier.titre,
+    y: dossier.type,
+    m: dossier.montant,
+    x: dossier.texte,
+    h: dossier.hash,
+    dt: dossier.date
   };
+  if (dossier.confirmation){
+    payload.c = {
+      n: dossier.confirmation.nom,
+      p: dossier.confirmation.tel,
+      dt: dossier.confirmation.date
+    };
+  }
   const base = location.origin + location.pathname;
   return `${base}?v=${encodePayload(payload)}`;
 }
@@ -443,17 +465,17 @@ async function initVuesExternes(){
 
     if (!dossier) return;
 
-    document.getElementById('vcTitre').textContent = dossier.titre || 'Dossier sans titre';
-    document.getElementById('vcType').textContent = dossier.type || '—';
-    document.getElementById('vcMontant').textContent = dossier.montant ? `${dossier.montant} FCFA` : 'Non précisé';
-    document.getElementById('vcTexte').textContent = dossier.texte || 'Non précisé';
-    document.getElementById('vcDate').textContent = formatDate(new Date(dossier.date));
-    document.getElementById('vcHash').textContent = dossier.hash;
+    document.getElementById('vcTitre').textContent = dossier.t || 'Dossier sans titre';
+    document.getElementById('vcType').textContent = dossier.y || '—';
+    document.getElementById('vcMontant').textContent = dossier.m ? `${dossier.m} FCFA` : 'Non précisé';
+    document.getElementById('vcTexte').textContent = dossier.x || 'Non précisé';
+    document.getElementById('vcDate').textContent = formatDate(new Date(dossier.dt));
+    document.getElementById('vcHash').textContent = dossier.h;
 
-    if (dossier.confirmation){
+    if (dossier.c){
       document.getElementById('vcConfirmationBloc').classList.remove('hidden');
-      document.getElementById('vcConfirmeParNom').textContent = dossier.confirmation.nom;
-      document.getElementById('vcConfirmeDate').textContent = formatDate(new Date(dossier.confirmation.date));
+      document.getElementById('vcConfirmeParNom').textContent = dossier.c.n;
+      document.getElementById('vcConfirmeDate').textContent = formatDate(new Date(dossier.c.dt));
     }
     return;
   }
@@ -467,12 +489,12 @@ async function initVuesExternes(){
     document.getElementById('footerNormal').style.display = 'none';
     document.getElementById('vueConfirmation').classList.remove('hidden');
 
-    document.getElementById('cfTitre').textContent = dossier.titre || 'Dossier sans titre';
-    document.getElementById('cfType').textContent = dossier.type || '—';
-    document.getElementById('cfMontant').textContent = dossier.montant ? `${dossier.montant} FCFA` : 'Non précisé';
-    document.getElementById('cfTexte').textContent = dossier.texte || 'Non précisé';
-    document.getElementById('cfDate').textContent = formatDate(new Date(dossier.date));
-    document.getElementById('cfHash').textContent = dossier.hash;
+    document.getElementById('cfTitre').textContent = dossier.t || 'Dossier sans titre';
+    document.getElementById('cfType').textContent = dossier.y || '—';
+    document.getElementById('cfMontant').textContent = dossier.m ? `${dossier.m} FCFA` : 'Non précisé';
+    document.getElementById('cfTexte').textContent = dossier.x || 'Non précisé';
+    document.getElementById('cfDate').textContent = formatDate(new Date(dossier.dt));
+    document.getElementById('cfHash').textContent = dossier.h;
 
     document.getElementById('confirmForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -480,10 +502,10 @@ async function initVuesExternes(){
       const tel = document.getElementById('cfTel').value.trim();
       const ts2 = new Date().toISOString();
 
-      const confHash = await hashText(`${dossier.hash}|${nom}|${tel}|${ts2}`);
+      const confHash = await hashText(`${dossier.h}|${nom}|${tel}|${ts2}`);
       const confirmation = {
-        hashOrigine: dossier.hash,
-        titre: dossier.titre,
+        hashOrigine: dossier.h,
+        titre: dossier.t,
         nom, tel, ts2, confHash
       };
 
@@ -494,7 +516,7 @@ async function initVuesExternes(){
       const lien = buildConfirmLink(confirmation);
       document.getElementById('cfShareLink').value = lien;
 
-      const msgWa = `Bonjour, j'ai confirmé l'accord "${dossier.titre}" sur Preuv'. Voici le certificat de confirmation : ${lien}`;
+      const msgWa = `Bonjour, j'ai confirmé l'accord "${dossier.t}" sur Preuv'. Voici le certificat de confirmation : ${lien}`;
       document.getElementById('btnWhatsappConfirm').href = `https://wa.me/?text=${encodeURIComponent(msgWa)}`;
 
       document.getElementById('btnCopierConfirm').addEventListener('click', (e2) => {
@@ -520,8 +542,8 @@ async function initVuesExternes(){
     }
 
     // Recalcul local du hash de confirmation pour vérifier l'intégrité
-    const attendu = await hashText(`${confirmation.hashOrigine}|${confirmation.nom}|${confirmation.tel}|${confirmation.ts2}`);
-    const valide = attendu === confirmation.confHash;
+    const attendu = await hashText(`${confirmation.h}|${confirmation.n}|${confirmation.p}|${confirmation.s}`);
+    const valide = attendu === confirmation.f;
 
     if (!valide){
       document.getElementById('vfCarteValide').classList.add('hidden');
@@ -529,21 +551,21 @@ async function initVuesExternes(){
       return;
     }
 
-    document.getElementById('vfNom').textContent = confirmation.nom;
-    document.getElementById('vfTel').textContent = confirmation.tel;
-    document.getElementById('vfDate').textContent = formatDate(new Date(confirmation.ts2));
-    document.getElementById('vfHashOrigine').textContent = confirmation.hashOrigine;
+    document.getElementById('vfNom').textContent = confirmation.n;
+    document.getElementById('vfTel').textContent = confirmation.p;
+    document.getElementById('vfDate').textContent = formatDate(new Date(confirmation.s));
+    document.getElementById('vfHashOrigine').textContent = confirmation.h;
 
     document.getElementById('btnImprimerVerif').addEventListener('click', () => window.print());
 
     document.getElementById('btnEnregistrerConfirmation').addEventListener('click', (e) => {
       const all = getDossiers();
-      const idx = all.findIndex(d => d.hash === confirmation.hashOrigine);
+      const idx = all.findIndex(d => d.hash === confirmation.h);
       if (idx !== -1){
         all[idx].confirmation = {
-          nom: confirmation.nom,
-          tel: confirmation.tel,
-          date: confirmation.ts2
+          nom: confirmation.n,
+          tel: confirmation.p,
+          date: confirmation.s
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
         e.target.textContent = 'Enregistré ✓';
