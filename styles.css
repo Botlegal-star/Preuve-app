@@ -300,6 +300,44 @@ textarea{resize:vertical;font-family:var(--font-body);}
 .di-btn:hover{border-color:var(--navy);}
 .di-btn-danger{color:var(--rust);}
 .di-btn-danger:hover{border-color:var(--rust);}
+
+/* Assistant de détection de risque */
+.risque-block{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:16px;
+}
+.risque-block-result{margin:0 0 24px;text-align:left;}
+.risque-titre{font-size:13px;font-weight:600;margin:0 0 10px;}
+.risque-panel{display:flex;flex-direction:column;gap:8px;}
+.alerte-item{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  font-size:13px;
+  line-height:1.5;
+  padding:10px 12px;
+  border-radius:8px;
+}
+.alerte-alerte{background:rgba(154,59,36,0.09);color:var(--rust);}
+.alerte-conseil{background:rgba(183,138,46,0.1);color:#8a6a1f;}
+.alerte-ok{font-size:13px;color:var(--sage);margin:0;padding:8px 4px;}
+.alerte-icone{flex-shrink:0;}
+
+/* QR code */
+.qr-box{
+  width:96px;
+  margin:0 auto 6px;
+  display:flex;
+  justify-content:center;
+}
+.qr-caption{
+  font-size:11px;
+  color:var(--ink-soft);
+  text-align:center;
+  margin:0 0 24px;
+}
 .badge-confirme{
   display:inline-block;
   font-size:11px;

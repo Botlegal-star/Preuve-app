@@ -76,6 +76,84 @@ function formatDate(d){
   }).format(d);
 }
 
+// --- Assistant de détection de risque (V1 : règles, pas encore une vraie IA connectée) ---
+
+function analyserRisques({ texte, type, montant }){
+  const t = (texte || '').toLowerCase();
+  const alertes = [];
+
+  const aUneDate = /(\d{1,2}\s*(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)|\d{1,2}\/\d{1,2}|avant le|d'ici|délai|le lendemain|sous \d+ (jour|jours|semaine|semaines))/i.test(t);
+  const aMoyenPaiement = /(mobile money|momo|mtn money|moov money|espèces|especes|cash|virement|chèque|cheque)/i.test(t);
+  const aClauseAnnulation = /(annulation|remboursement|rétractation|retractation|dédommagement|penalite|pénalité)/i.test(t);
+  const tauxMatch = t.match(/(\d{1,3})\s*%/);
+
+  if ((type === 'Vente' || type === 'Service') && !aUneDate){
+    alertes.push({
+      niveau:'alerte',
+      message:"Aucune date ou délai précis détecté. Sans date de livraison ou d'exécution, il sera difficile de prouver un retard en cas de litige. Ajoutez une date précise."
+    });
+  }
+
+  if (montant && !aMoyenPaiement){
+    alertes.push({
+      niveau:'conseil',
+      message:"Le moyen de paiement n'est pas précisé (Mobile Money, espèces, virement...). Mentionnez-le : c'est souvent la première chose vérifiée en cas de désaccord."
+    });
+  }
+
+  if (type === 'Prêt / dette'){
+    if (tauxMatch){
+      const taux = parseInt(tauxMatch[1], 10);
+      if (taux > 10){
+        alertes.push({
+          niveau:'alerte',
+          message:`Un taux d'intérêt de ${taux}% a été mentionné. Au-delà de certains seuils, un taux d'intérêt élevé peut être considéré comme usuraire et donc illégal. Vérifiez ce point avant de vous engager.`
+        });
+      }
+    } else {
+      alertes.push({
+        niveau:'conseil',
+        message:"Il s'agit d'un prêt, mais aucun taux d'intérêt (ou l'absence d'intérêt) n'est précisé. Clarifiez ce point pour éviter toute ambiguïté."
+      });
+    }
+    if (!aUneDate){
+      alertes.push({
+        niveau:'alerte',
+        message:"Aucune date de remboursement détectée. Un prêt sans échéance claire est très difficile à faire valoir en cas de non-remboursement."
+      });
+    }
+  }
+
+  if (type === 'Location' && !aClauseAnnulation){
+    alertes.push({
+      niveau:'conseil',
+      message:"Aucune clause sur l'annulation, la caution ou le remboursement en cas de désaccord. Préciser ces conditions renforce beaucoup le dossier."
+    });
+  }
+
+  if (t.length > 0 && t.length < 20){
+    alertes.push({
+      niveau:'conseil',
+      message:"Le résumé est très court. Plus vous détaillez qui s'engage à quoi et quand, plus le dossier aura de valeur en cas de désaccord."
+    });
+  }
+
+  return alertes;
+}
+
+function renderAlertes(container, alertes){
+  if (!alertes.length){
+    container.innerHTML = '<p class="alerte-ok">✓ Aucun point de vigilance détecté sur ce résumé.</p>';
+    return;
+  }
+  container.innerHTML = alertes.map(a => `
+    <div class="alerte-item alerte-${a.niveau}">
+      <span class="alerte-icone">${a.niveau === 'alerte' ? '⚠️' : '💡'}</span>
+      <span>${escapeHtml(a.message)}</span>
+    </div>
+  `).join('');
+}
+
 function renderDossiers(){
   const list = document.getElementById('listeDossiers');
   const all = getDossiers();
@@ -177,6 +255,20 @@ function buildConfirmLink(confirmation){
   return `${base}?c=${encodePayload(confirmation)}`;
 }
 
+function buildVerifyLink(dossier){
+  const payload = {
+    titre: dossier.titre,
+    type: dossier.type,
+    montant: dossier.montant,
+    texte: dossier.texte,
+    hash: dossier.hash,
+    date: dossier.date,
+    confirmation: dossier.confirmation || null
+  };
+  const base = location.origin + location.pathname;
+  return `${base}?v=${encodePayload(payload)}`;
+}
+
 async function copyToClipboard(text, btn){
   try{
     await navigator.clipboard.writeText(text);
@@ -212,6 +304,16 @@ function afficherResultat(dossier, { modeEdition } = {}){
     conseilEl.classList.remove('weak');
   }
 
+  // Points de vigilance figés au moment de la certification
+  const alertesBloc = document.getElementById('resAlertes');
+  const alertes = dossier.alertes || [];
+  if (alertes.length){
+    renderAlertes(document.getElementById('resAlertesListe'), alertes);
+    alertesBloc.classList.remove('hidden');
+  } else {
+    alertesBloc.classList.add('hidden');
+  }
+
   document.getElementById('resultat').classList.remove('hidden');
   document.getElementById('resultat').scrollIntoView({ behavior:'smooth', block:'center' });
 
@@ -219,7 +321,40 @@ function afficherResultat(dossier, { modeEdition } = {}){
   document.getElementById('shareLink').value = lien;
   const msgWa = `Bonjour, je vous partage le dossier "${dossier.titre}" certifié sur Preuv' pour confirmation : ${lien}`;
   document.getElementById('btnWhatsappPartage').href = `https://wa.me/?text=${encodeURIComponent(msgWa)}`;
+
+  // QR code pointant vers le certificat vérifiable en lecture seule
+  const qrContainer = document.getElementById('qrCode');
+  qrContainer.innerHTML = '';
+  if (window.QRCode){
+    new QRCode(qrContainer, {
+      text: buildVerifyLink(dossier),
+      width: 96,
+      height: 96,
+      colorDark: '#1B2A4A',
+      colorLight: '#ffffff'
+    });
+  }
 }
+
+// Analyse de risque en direct pendant la saisie
+let debounceTimer;
+function declencherAnalyseEnDirect(){
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    const texte = document.getElementById('texte').value.trim();
+    const type = document.getElementById('type').value;
+    const montant = document.getElementById('montant').value;
+    const container = document.getElementById('analyseRisques');
+    if (!texte){
+      container.innerHTML = '<p class="alerte-ok">Commencez à décrire l\'accord pour voir l\'analyse.</p>';
+      return;
+    }
+    renderAlertes(container, analyserRisques({ texte, type, montant }));
+  }, 400);
+}
+document.getElementById('texte').addEventListener('input', declencherAnalyseEnDirect);
+document.getElementById('type').addEventListener('change', declencherAnalyseEnDirect);
+document.getElementById('montant').addEventListener('input', declencherAnalyseEnDirect);
 
 // Formulaire
 const form = document.getElementById('dossierForm');
@@ -233,6 +368,7 @@ form.addEventListener('submit', async (e) => {
   const fichierInput = document.getElementById('fichier');
   const fichier = fichierInput.files[0];
   const editingId = form.dataset.editingId;
+  const alertes = analyserRisques({ texte, type, montant });
 
   // Construire l'empreinte à partir de tous les éléments du dossier
   let combined = `${titre}|${type}|${montant}|${texte}|${Date.now()}`;
@@ -249,7 +385,7 @@ form.addEventListener('submit', async (e) => {
     // Modification : le contenu ayant changé, une nouvelle empreinte et un nouvel horodatage
     // sont générés — toute confirmation précédente devient invalide et est réinitialisée.
     dossier = updateDossier(editingId, {
-      titre, type, montant, texte, hash,
+      titre, type, montant, texte, hash, alertes,
       date: date.toISOString(),
       fichierNom: fichier ? fichier.name : null,
       confirmation: null
@@ -258,7 +394,7 @@ form.addEventListener('submit', async (e) => {
     document.getElementById('btnSubmitForm').textContent = 'Générer la certification';
     document.getElementById('editNotice').classList.add('hidden');
   } else {
-    dossier = { id: genId(), titre, type, montant, texte, hash, date: date.toISOString(), fichierNom: fichier ? fichier.name : null };
+    dossier = { id: genId(), titre, type, montant, texte, hash, alertes, date: date.toISOString(), fichierNom: fichier ? fichier.name : null };
     saveDossier(dossier);
   }
 
@@ -296,6 +432,31 @@ async function initVuesExternes(){
   const params = new URLSearchParams(location.search);
   const dParam = params.get('d');
   const cParam = params.get('c');
+  const vParam = params.get('v');
+
+  if (vParam){
+    const dossier = decodePayload(vParam);
+    document.getElementById('topbarNormal').style.display = 'none';
+    document.getElementById('mainNormal').style.display = 'none';
+    document.getElementById('footerNormal').style.display = 'none';
+    document.getElementById('vueCertificat').classList.remove('hidden');
+
+    if (!dossier) return;
+
+    document.getElementById('vcTitre').textContent = dossier.titre || 'Dossier sans titre';
+    document.getElementById('vcType').textContent = dossier.type || '—';
+    document.getElementById('vcMontant').textContent = dossier.montant ? `${dossier.montant} FCFA` : 'Non précisé';
+    document.getElementById('vcTexte').textContent = dossier.texte || 'Non précisé';
+    document.getElementById('vcDate').textContent = formatDate(new Date(dossier.date));
+    document.getElementById('vcHash').textContent = dossier.hash;
+
+    if (dossier.confirmation){
+      document.getElementById('vcConfirmationBloc').classList.remove('hidden');
+      document.getElementById('vcConfirmeParNom').textContent = dossier.confirmation.nom;
+      document.getElementById('vcConfirmeDate').textContent = formatDate(new Date(dossier.confirmation.date));
+    }
+    return;
+  }
 
   if (dParam){
     const dossier = decodePayload(dParam);
