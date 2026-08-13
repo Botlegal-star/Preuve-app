@@ -498,3 +498,7 @@ textarea{resize:vertical;font-family:var(--font-body);}
   .mono{font-size:11px !important;}
   .seal, .seal-small{animation:none !important;position:static !important;transform:none !important;margin:0 auto 16px !important;}
 }
+
+.hidden{display:none !important;}
+.auth-status{display:flex;align-items:center;gap:10px;}
+.auth-email{font-size:13px;color:var(--ink-soft);}

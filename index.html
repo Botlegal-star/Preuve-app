@@ -20,6 +20,11 @@
     <nav class="topnav">
       <button class="nav-link" data-goto="creer">Nouveau dossier</button>
       <button class="nav-link" data-goto="dossiers">Mes dossiers</button>
+      <span id="authStatusConnecte" class="auth-status hidden">
+        <span id="authEmailAffiche" class="auth-email"></span>
+        <button class="nav-link" id="btnDeconnexion">Déconnexion</button>
+      </span>
+      <button class="btn btn-primary btn-small" id="btnOuvrirAuth">Se connecter</button>
     </nav>
   </div>
 </header>
@@ -66,51 +71,9 @@
           </svg>
         </div>
       </div>
-      <h3>Confirmation enregistrée</h3>
-      <p class="conseil">Renvoyez ceci à la personne qui vous a envoyé le dossier — en un clic via WhatsApp, ou en copiant le lien.</p>
-      <div class="share-block">
-        <a href="#" id="btnWhatsappConfirm" class="btn btn-whatsapp" target="_blank" rel="noopener">Envoyer via WhatsApp</a>
-        <div class="share-row" style="margin-top:12px;">
-          <input type="text" id="cfShareLink" class="share-input" readonly>
-          <button class="btn btn-ghost btn-small" id="btnCopierConfirm">Copier le lien</button>
-        </div>
-      </div>
+      <h3>Confirmation enregistrée ✓</h3>
+      <p class="conseil">C'est fait ! La personne qui a créé ce dossier verra automatiquement votre confirmation apparaître de son côté — vous n'avez rien d'autre à faire.</p>
       <button class="btn btn-ghost" id="btnImprimerConfirm">Exporter en PDF</button>
-    </div>
-  </div>
-</div>
-
-<div id="vueVerification" class="overlay-view hidden">
-  <div class="wrap overlay-wrap">
-    <div class="brand brand-center">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">Preuv'</span>
-    </div>
-    <div class="confirm-card" id="vfCarteValide">
-      <div class="result-seal-wrap">
-        <div class="seal seal-small">
-          <svg viewBox="0 0 100 100" class="seal-svg">
-            <circle cx="50" cy="50" r="46" />
-            <circle cx="50" cy="50" r="38" />
-            <text x="50" y="46" text-anchor="middle" class="seal-text">VÉRIFIÉ</text>
-            <text x="50" y="62" text-anchor="middle" class="seal-text seal-text-sm">PREUV'</text>
-          </svg>
-        </div>
-      </div>
-      <h3>Confirmation vérifiée ✓</h3>
-      <dl class="result-grid">
-        <div><dt>Confirmé par</dt><dd id="vfNom">—</dd></div>
-        <div><dt>Téléphone</dt><dd id="vfTel">—</dd></div>
-        <div><dt>Confirmé le</dt><dd id="vfDate">—</dd></div>
-        <div><dt>Empreinte du dossier d'origine</dt><dd id="vfHashOrigine" class="mono">—</dd></div>
-      </dl>
-      <p class="conseil">L'empreinte de cette confirmation correspond exactement à votre dossier d'origine — elle n'a pas été modifiée. Vous avez maintenant une preuve à deux parties.</p>
-      <button class="btn btn-primary" id="btnEnregistrerConfirmation">Enregistrer dans mon dossier</button>
-      <button class="btn btn-ghost" id="btnImprimerVerif">Exporter en PDF</button>
-    </div>
-    <div class="confirm-card hidden" id="vfCarteInvalide">
-      <h3>⚠️ Cette confirmation ne correspond à aucun dossier valide</h3>
-      <p class="conseil weak">Le lien semble corrompu ou a été modifié. Redemandez un nouveau lien à la personne concernée.</p>
     </div>
   </div>
 </div>
@@ -121,7 +84,7 @@
       <span class="brand-mark" aria-hidden="true"></span>
       <span class="brand-name">Preuv'</span>
     </div>
-    <div class="confirm-card">
+    <div class="confirm-card" id="vcCarteValide">
       <div class="result-seal-wrap">
         <div class="seal seal-small">
           <svg viewBox="0 0 100 100" class="seal-svg">
@@ -145,6 +108,40 @@
         <p class="conseil">✓ Ce dossier a également été confirmé par une deuxième partie : <span id="vcConfirmeParNom"></span>, le <span id="vcConfirmeDate"></span>.</p>
       </div>
       <p class="print-legal" style="margin-top:20px;">Ce certificat a été généré par Preuv' et reflète les informations telles que déclarées et horodatées par son créateur. Preuv' ne constitue pas un avis juridique.</p>
+    </div>
+    <div class="confirm-card hidden" id="vcCarteInvalide">
+      <h3>⚠️ Ce lien ne correspond à aucun dossier valide</h3>
+      <p class="conseil weak">Le lien semble corrompu, expiré, ou le dossier a été supprimé. Redemandez un nouveau lien à la personne concernée.</p>
+    </div>
+  </div>
+</div>
+
+<div id="authPanel" class="overlay-view hidden">
+  <div class="wrap overlay-wrap">
+    <div class="brand brand-center">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Preuv'</span>
+    </div>
+    <div class="confirm-card">
+      <p class="eyebrow" id="authTitre">Connexion</p>
+      <h2 id="authSousTitre">Accédez à vos dossiers</h2>
+      <p class="conseil" id="authErreur" style="display:none;"></p>
+      <form id="authForm" class="form-card form-card-inline">
+        <label class="field">
+          <span class="field-label">Adresse e-mail</span>
+          <input type="email" id="authEmail" required autocomplete="email">
+        </label>
+        <label class="field">
+          <span class="field-label">Mot de passe</span>
+          <input type="password" id="authMdp" required autocomplete="current-password" minlength="6">
+        </label>
+        <button type="submit" class="btn btn-primary" id="btnAuthValider">Se connecter</button>
+      </form>
+      <p style="margin-top:16px;font-size:13px;">
+        <span id="authBascule1" class="hidden">Pas encore de compte ? <a href="#" id="lienVersInscription">Créez-en un</a></span>
+        <span id="authBascule2">Déjà un compte ? <a href="#" id="lienVersConnexion">Connectez-vous</a></span>
+      </p>
+      <button class="btn btn-ghost" id="btnFermerAuth" style="margin-top:10px;">Retour</button>
     </div>
   </div>
 </div>
@@ -180,6 +177,12 @@
     <h2>Nouveau dossier</h2>
     <p class="panel-sub">Décrivez l'accord, puis ajoutez ce qui en fait la preuve — une capture, un reçu, une note vocale, ou simplement le texte de l'échange.</p>
 
+    <div id="creerVerrou" class="form-card" style="text-align:center;">
+      <p class="conseil">🔒 Un compte gratuit est nécessaire pour créer et conserver vos dossiers en ligne, sur tous vos appareils.</p>
+      <button class="btn btn-primary" id="btnCreerCompteDepuisCreer">Créer un compte gratuit</button>
+    </div>
+
+    <div id="creerProtege" class="hidden">
     <p id="editNotice" class="edit-notice hidden">✏️ Vous modifiez un dossier existant — comme le contenu change, une nouvelle empreinte et un nouvel horodatage seront générés, et toute confirmation déjà reçue sera réinitialisée.</p>
 
     <form id="dossierForm" class="form-card">
@@ -264,12 +267,19 @@
         <button class="btn btn-ghost" id="btnNouveau">Créer un autre dossier</button>
       </div>
     </div>
+    </div>
   </section>
 
   <section id="dossiers" class="panel wrap">
     <h2>Mes dossiers</h2>
-    <p class="panel-sub">Stockés uniquement sur cet appareil pour l'instant — la synchronisation en ligne arrive dans une prochaine version.</p>
-    <div id="listeDossiers" class="dossiers-list">
+    <p class="panel-sub">Synchronisés sur tous vos appareils une fois connecté.</p>
+
+    <div id="dossiersVerrou" class="form-card" style="text-align:center;">
+      <p class="conseil">🔒 Connectez-vous pour voir vos dossiers.</p>
+      <button class="btn btn-primary" id="btnCreerCompteDepuisDossiers">Se connecter / Créer un compte</button>
+    </div>
+
+    <div id="listeDossiers" class="dossiers-list hidden">
       <p class="empty">Aucun dossier pour le moment. Créez-en un pour le voir apparaître ici.</p>
     </div>
   </section>
@@ -298,6 +308,20 @@
   <p class="print-legal print-meta">Document généré le <span id="printDateGen"></span> — preuv-app.github.io</p>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyARPcKMbw-acIHJ2m1gFILVq5o04HJBSIU",
+    authDomain: "preuv-app.firebaseapp.com",
+    projectId: "preuv-app",
+    storageBucket: "preuv-app.firebasestorage.app",
+    messagingSenderId: "369909674104",
+    appId: "1:369909674104:web:40e3ddabef805808eb3d8d"
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="app.js"></script>
