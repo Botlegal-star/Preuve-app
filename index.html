@@ -107,6 +107,13 @@
       <div id="vcConfirmationBloc" class="hidden">
         <p class="conseil">✓ Ce dossier a également été confirmé par une deuxième partie : <span id="vcConfirmeParNom"></span>, le <span id="vcConfirmeDate"></span>.</p>
       </div>
+      <div id="vcLivraisonBloc" class="hidden">
+        <p class="conseil">📦 Réception confirmée le <span id="vcLivraisonDate"></span>.</p>
+      </div>
+      <div id="vcLivraisonAction" class="hidden" style="margin:16px 0;">
+        <p style="font-size:13px;color:var(--ink-soft);margin-bottom:10px;">Si vous avez reçu le bien ou le service décrit ci-dessus, conformément à l'accord :</p>
+        <button class="btn btn-primary" id="btnConfirmerLivraison">📦 Je confirme avoir reçu ceci</button>
+      </div>
       <p class="print-legal" style="margin-top:20px;">Ce certificat a été généré par Preuv' et reflète les informations telles que déclarées et horodatées par son créateur. Preuv' ne constitue pas un avis juridique.</p>
     </div>
     <div class="confirm-card hidden" id="vcCarteInvalide">

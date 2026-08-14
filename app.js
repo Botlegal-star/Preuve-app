@@ -250,13 +250,14 @@ function renderDossiers(){
   list.innerHTML = dossiersCache.map(d => `
     <div class="dossier-item">
       <div class="di-info">
-        <div class="di-title">${escapeHtml(d.titre)} ${d.confirmation ? '<span class="badge-confirme">✓ confirmé</span>' : ''}</div>
-        <div class="di-meta">${escapeHtml(d.type)} · ${formatDate(new Date(d.date))}${d.confirmation ? ` · confirmé par ${escapeHtml(d.confirmation.nom)}` : ''}</div>
+        <div class="di-title">${escapeHtml(d.titre)} ${d.confirmation ? '<span class="badge-confirme">✓ confirmé</span>' : ''} ${d.livraison ? '<span class="badge-confirme badge-livraison">📦 livré</span>' : ''}</div>
+        <div class="di-meta">${escapeHtml(d.type)} · ${formatDate(new Date(d.date))}${d.confirmation ? ` · confirmé par ${escapeHtml(d.confirmation.nom)}` : ''}${d.livraison ? ` · reçu le ${formatDate(new Date(d.livraison.date))}` : ''}</div>
         <div class="di-hash">${d.hash.slice(0,12)}…</div>
       </div>
       <div class="di-actions">
         <button class="di-btn" data-action="voir" data-id="${d.id}">Voir</button>
         <button class="di-btn" data-action="modifier" data-id="${d.id}">Modifier</button>
+        ${d.confirmation && !d.livraison ? `<button class="di-btn" data-action="livraison" data-id="${d.id}">📦 Marquer livré</button>` : ''}
         <button class="di-btn di-btn-danger" data-action="supprimer" data-id="${d.id}">Supprimer</button>
       </div>
     </div>
@@ -272,6 +273,14 @@ document.getElementById('listeDossiers').addEventListener('click', async (e) => 
   if (action === 'supprimer'){
     if (confirm('Supprimer définitivement ce dossier ? Cette action est irréversible.')){
       await supprimerDossierFirestore(id);
+    }
+  }
+
+  if (action === 'livraison'){
+    if (confirm('Confirmer que le bien ou le service décrit dans ce dossier a bien été livré et reçu ?')){
+      await mettreAJourDossierFirestore(id, {
+        livraison: { date: new Date().toISOString(), note: 'Confirmé depuis le tableau de bord' }
+      });
     }
   }
 
@@ -487,6 +496,30 @@ async function initVueExterne(){
     document.getElementById('vcConfirmationBloc').classList.remove('hidden');
     document.getElementById('vcConfirmeParNom').textContent = dossier.confirmation.nom;
     document.getElementById('vcConfirmeDate').textContent = formatDate(new Date(dossier.confirmation.date));
+
+    if (dossier.livraison){
+      document.getElementById('vcLivraisonBloc').classList.remove('hidden');
+      document.getElementById('vcLivraisonDate').textContent = formatDate(new Date(dossier.livraison.date));
+    } else {
+      const actionBloc = document.getElementById('vcLivraisonAction');
+      actionBloc.classList.remove('hidden');
+      document.getElementById('btnConfirmerLivraison').addEventListener('click', async (e) => {
+        e.target.disabled = true;
+        e.target.textContent = 'Enregistrement...';
+        try{
+          await db.collection('dossiers').doc(docId).update({
+            livraison: { date: new Date().toISOString(), note: 'Confirmé via le lien partagé' }
+          });
+          actionBloc.classList.add('hidden');
+          document.getElementById('vcLivraisonBloc').classList.remove('hidden');
+          document.getElementById('vcLivraisonDate').textContent = formatDate(new Date());
+        }catch(err){
+          e.target.disabled = false;
+          e.target.textContent = '📦 Je confirme avoir reçu ceci';
+          alert("La confirmation de réception n'a pas pu être enregistrée. Réessayez.");
+        }
+      });
+    }
     return;
   }
 

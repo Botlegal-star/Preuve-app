@@ -502,3 +502,5 @@ textarea{resize:vertical;font-family:var(--font-body);}
 .hidden{display:none !important;}
 .auth-status{display:flex;align-items:center;gap:10px;}
 .auth-email{font-size:13px;color:var(--ink-soft);}
+
+.badge-livraison{background:rgba(183,138,46,0.15);color:#8a6a1f;margin-left:4px;}
