@@ -115,6 +115,10 @@
         <p style="font-size:13px;color:var(--ink-soft);margin-bottom:10px;">Si vous avez reçu le bien ou le service décrit ci-dessus, conformément à l'accord :</p>
         <button class="btn btn-primary" id="btnConfirmerLivraison">📦 Je confirme avoir reçu ceci</button>
       </div>
+      <div id="vcHistorique" class="risque-block hidden" style="text-align:left;margin:16px 0;">
+        <p class="risque-titre">📜 Ce dossier a été modifié depuis sa création — historique :</p>
+        <div id="vcHistoriqueListe" class="risque-panel"></div>
+      </div>
       <p class="print-legal" style="margin-top:20px;">Ce certificat a été généré par Preuv' et reflète les informations telles que déclarées et horodatées par son créateur. Preuv' ne constitue pas un avis juridique.</p>
     </div>
     <div class="confirm-card hidden" id="vcCarteInvalide">
@@ -260,6 +264,10 @@
       <div id="resAlertes" class="risque-block risque-block-result hidden">
         <p class="risque-titre">Points de vigilance relevés à la certification</p>
         <div id="resAlertesListe" class="risque-panel"></div>
+      </div>
+      <div id="resHistorique" class="risque-block risque-block-result hidden">
+        <p class="risque-titre">📜 Historique des versions — rien n'est jamais effacé</p>
+        <div id="resHistoriqueListe" class="risque-panel"></div>
       </div>
       <div class="share-block">
         <p class="share-label">Envoyer à l'autre partie pour confirmation</p>

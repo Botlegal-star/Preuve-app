@@ -366,6 +366,20 @@ function afficherResultat(dossier){
     alertesBloc.classList.add('hidden');
   }
 
+  const histoBloc = document.getElementById('resHistorique');
+  const historique = dossier.historique || [];
+  if (historique.length){
+    document.getElementById('resHistoriqueListe').innerHTML = historique.map((v, i) => `
+      <div class="alerte-item alerte-conseil">
+        <span class="alerte-icone">v${i + 1}</span>
+        <span><strong>${escapeHtml(v.titre)}</strong> — modifié le ${formatDate(new Date(v.date))} · empreinte : <span class="mono">${v.hash.slice(0,16)}…</span></span>
+      </div>
+    `).join('');
+    histoBloc.classList.remove('hidden');
+  } else {
+    histoBloc.classList.add('hidden');
+  }
+
   document.getElementById('resultat').classList.remove('hidden');
   document.getElementById('resultat').scrollIntoView({ behavior:'smooth', block:'center' });
 
@@ -437,11 +451,24 @@ form.addEventListener('submit', async (e) => {
   btnSubmit.disabled = true;
 
   let dossierId;
+  let historiqueMisAJour = null;
   const donnees = { titre, type, montant, texte, hash, alertes, date: date.toISOString(), fichierNom: fichier ? fichier.name : null };
 
   try{
     if (editingId){
-      await mettreAJourDossierFirestore(editingId, { ...donnees, confirmation: null });
+      const ancienDossier = getDossierById(editingId);
+      const ancienneVersion = ancienDossier ? {
+        titre: ancienDossier.titre, type: ancienDossier.type, montant: ancienDossier.montant,
+        texte: ancienDossier.texte, hash: ancienDossier.hash, date: ancienDossier.date
+      } : null;
+
+      const changements = { ...donnees, confirmation: null, livraison: firebase.firestore.FieldValue.delete() };
+      if (ancienneVersion){
+        historiqueMisAJour = [ ...(ancienDossier.historique || []), ancienneVersion ];
+        changements.historique = firebase.firestore.FieldValue.arrayUnion(ancienneVersion);
+      }
+
+      await mettreAJourDossierFirestore(editingId, changements);
       dossierId = editingId;
       delete form.dataset.editingId;
       document.getElementById('editNotice').classList.add('hidden');
@@ -453,7 +480,7 @@ form.addEventListener('submit', async (e) => {
     btnSubmit.disabled = false;
   }
 
-  afficherResultat({ id: dossierId, ...donnees });
+  afficherResultat({ id: dossierId, ...donnees, historique: historiqueMisAJour });
 });
 
 document.getElementById('btnCopierLien').addEventListener('click', (e) => {
@@ -515,9 +542,18 @@ async function initVueExterne(){
     document.getElementById('vcDate').textContent = formatDate(new Date(dossier.date));
     document.getElementById('vcHash').textContent = dossier.hash;
     document.getElementById('vcTimeline').innerHTML = buildTimelineHTML(dossier);
-    document.getElementById('vcConfirmationBloc').classList.remove('hidden');
-    document.getElementById('vcConfirmeParNom').textContent = dossier.confirmation.nom;
+    document.getElementById('vcConfirmationBloc').classList.remove('hidden');    document.getElementById('vcConfirmeParNom').textContent = dossier.confirmation.nom;
     document.getElementById('vcConfirmeDate').textContent = formatDate(new Date(dossier.confirmation.date));
+
+    if (dossier.historique && dossier.historique.length){
+      document.getElementById('vcHistoriqueListe').innerHTML = dossier.historique.map((v, i) => `
+        <div class="alerte-item alerte-conseil">
+          <span class="alerte-icone">v${i + 1}</span>
+          <span><strong>${escapeHtml(v.titre)}</strong> — version antérieure du ${formatDate(new Date(v.date))} · empreinte : <span class="mono">${v.hash.slice(0,16)}…</span></span>
+        </div>
+      `).join('');
+      document.getElementById('vcHistorique').classList.remove('hidden');
+    }
 
     if (dossier.livraison){
       document.getElementById('vcLivraisonBloc').classList.remove('hidden');
