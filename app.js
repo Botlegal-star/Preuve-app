@@ -112,6 +112,26 @@ function renderAlertes(container, alertes){
   `).join('');
 }
 
+function buildTimelineHTML(dossier){
+  const etapes = [
+    { titre: 'Accord créé et certifié', date: dossier.date, fait: true },
+    { titre: 'Confirmé par les deux parties', date: dossier.confirmation ? dossier.confirmation.date : null, fait: !!dossier.confirmation },
+    { titre: 'Réception confirmée', date: dossier.livraison ? dossier.livraison.date : null, fait: !!dossier.livraison }
+  ];
+  return etapes.map(et => `
+    <div class="timeline-step ${et.fait ? 'done' : ''}">
+      <div class="timeline-marker">
+        <div class="timeline-dot"></div>
+        <div class="timeline-connector"></div>
+      </div>
+      <div class="timeline-content">
+        <div class="timeline-title">${et.fait ? '✓ ' : '○ '}${et.titre}</div>
+        <div class="timeline-date">${et.fait ? formatDate(new Date(et.date)) : 'En attente'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
 // --- Authentification ---
 
 let authMode = 'login';
@@ -323,6 +343,7 @@ function afficherResultat(dossier){
   document.getElementById('resTitre').textContent = dossier.titre || 'Dossier sans titre';
   document.getElementById('resDate').textContent = formatDate(new Date(dossier.date));
   document.getElementById('resHash').textContent = dossier.hash;
+  document.getElementById('resTimeline').innerHTML = buildTimelineHTML(dossier);
 
   const force = evaluerForce({ texte: dossier.texte, montant: dossier.montant, fichier: dossier.fichierNom, type: dossier.type });
   document.getElementById('resForce').textContent = force.niveau;
@@ -493,6 +514,7 @@ async function initVueExterne(){
     document.getElementById('vcTexte').textContent = dossier.texte || 'Non précisé';
     document.getElementById('vcDate').textContent = formatDate(new Date(dossier.date));
     document.getElementById('vcHash').textContent = dossier.hash;
+    document.getElementById('vcTimeline').innerHTML = buildTimelineHTML(dossier);
     document.getElementById('vcConfirmationBloc').classList.remove('hidden');
     document.getElementById('vcConfirmeParNom').textContent = dossier.confirmation.nom;
     document.getElementById('vcConfirmeDate').textContent = formatDate(new Date(dossier.confirmation.date));
