@@ -5,6 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Preuv' — Certifiez vos échanges</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<meta name="description" content="Preuv' capture, horodate et certifie vos accords conclus en ligne — ventes, locations, prêts, services — avec confirmation à deux parties et preuve de livraison.">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Preuv'">
+<meta property="og:title" content="Preuv' — Certifiez vos échanges en ligne">
+<meta property="og:description" content="Preuve numérique horodatée, double confirmation entre les deux parties, et score de confiance — pour tous vos accords en ligne.">
+<meta property="og:image" content="https://botlegal-star.github.io/Preuve-app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://botlegal-star.github.io/Preuve-app/">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Preuv' — Certifiez vos échanges en ligne">
+<meta name="twitter:description" content="Preuve numérique horodatée, double confirmation entre les deux parties, et score de confiance.">
+<meta name="twitter:image" content="https://botlegal-star.github.io/Preuve-app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -224,6 +240,17 @@
           <span class="field-label">Montant concerné (FCFA)</span>
           <input type="number" id="montant" placeholder="Ex. 25000">
         </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Téléphone de l'autre partie (optionnel)</span>
+        <input type="text" id="autrePartieTel" placeholder="Ex. 97 00 00 00">
+        <span style="font-size:11px;color:var(--ink-soft);">Permet de vérifier si ce numéro apparaît dans d'autres dossiers Preuv' en attente — un signal de vigilance utile avant de vous engager.</span>
+      </label>
+
+      <div id="vigilanceBloc" class="risque-block hidden">
+        <p class="risque-titre">🛡️ Vigilance croisée</p>
+        <div id="vigilanceContenu" class="risque-panel"></div>
       </div>
 
       <label class="field">

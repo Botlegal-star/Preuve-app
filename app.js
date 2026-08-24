@@ -397,6 +397,8 @@ document.getElementById('listeDossiers').addEventListener('click', async (e) => 
     document.getElementById('type').value = d.type;
     document.getElementById('montant').value = d.montant || '';
     document.getElementById('texte').value = d.texte || '';
+    document.getElementById('autrePartieTel').value = d.autrePartieTel || '';
+    document.getElementById('vigilanceBloc').classList.add('hidden');
     form.dataset.editingId = id;
     document.getElementById('btnSubmitForm').textContent = 'Mettre à jour la certification';
     document.getElementById('editNotice').classList.remove('hidden');
@@ -501,6 +503,53 @@ document.getElementById('texte').addEventListener('input', declencherAnalyseEnDi
 document.getElementById('type').addEventListener('change', declencherAnalyseEnDirect);
 document.getElementById('montant').addEventListener('input', declencherAnalyseEnDirect);
 
+// Vigilance croisée : ce numéro apparaît-il dans d'autres dossiers Preuv' non confirmés ?
+let debounceVigilance;
+document.getElementById('autrePartieTel').addEventListener('input', (e) => {
+  clearTimeout(debounceVigilance);
+  const tel = e.target.value.trim();
+  const bloc = document.getElementById('vigilanceBloc');
+  if (tel.length < 6){ bloc.classList.add('hidden'); return; }
+
+  debounceVigilance = setTimeout(async () => {
+    const excludeId = form.dataset.editingId || null;
+    const resultat = await verifierVigilance(tel, excludeId);
+    afficherVigilance(resultat);
+  }, 600);
+});
+
+async function verifierVigilance(tel, excludeId){
+  try{
+    const snap = await db.collection('dossiers').where('autrePartieTel', '==', tel).get();
+    let enAttente = 0;
+    let total = 0;
+    snap.forEach(doc => {
+      if (doc.id === excludeId) return;
+      total++;
+      if (!doc.data().confirmation) enAttente++;
+    });
+    return { total, enAttente };
+  }catch(err){
+    console.error('Vérification de vigilance impossible :', err);
+    return null;
+  }
+}
+
+function afficherVigilance(resultat){
+  const bloc = document.getElementById('vigilanceBloc');
+  const contenu = document.getElementById('vigilanceContenu');
+  if (!resultat){ bloc.classList.add('hidden'); return; }
+
+  bloc.classList.remove('hidden');
+  if (resultat.total === 0){
+    contenu.innerHTML = "<p class=\"alerte-ok\">✓ Ce numéro n'apparaît dans aucun autre dossier Preuv'.</p>";
+  } else if (resultat.enAttente > 0){
+    contenu.innerHTML = `<div class="alerte-item alerte-alerte"><span class="alerte-icone">⚠️</span><span>Ce numéro apparaît dans <strong>${resultat.enAttente}</strong> autre${resultat.enAttente>1?'s':''} dossier${resultat.enAttente>1?'s':''} Preuv' encore <strong>en attente de confirmation</strong>. Ce n'est pas une preuve de problème, mais ça vaut la peine de vérifier avant de vous engager davantage.</span></div>`;
+  } else {
+    contenu.innerHTML = `<p class="alerte-ok">Ce numéro apparaît dans ${resultat.total} autre${resultat.total>1?'s':''} dossier${resultat.total>1?'s':''} Preuv', tous déjà confirmés — plutôt rassurant.</p>`;
+  }
+}
+
 // Formulaire principal
 const form = document.getElementById('dossierForm');
 form.addEventListener('submit', async (e) => {
@@ -511,6 +560,7 @@ form.addEventListener('submit', async (e) => {
   const type = document.getElementById('type').value;
   const montant = document.getElementById('montant').value;
   const texte = document.getElementById('texte').value.trim();
+  const autrePartieTel = document.getElementById('autrePartieTel').value.trim();
   const fichierInput = document.getElementById('fichier');
   const fichier = fichierInput.files[0];
   const editingId = form.dataset.editingId;
@@ -532,7 +582,7 @@ form.addEventListener('submit', async (e) => {
 
   let dossierId;
   let historiqueMisAJour = null;
-  const donnees = { titre, type, montant, texte, hash, alertes, date: date.toISOString(), fichierNom: fichier ? fichier.name : null };
+  const donnees = { titre, type, montant, texte, hash, alertes, autrePartieTel: autrePartieTel || null, date: date.toISOString(), fichierNom: fichier ? fichier.name : null };
 
   try{
     if (editingId){
