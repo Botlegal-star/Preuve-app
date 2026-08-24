@@ -522,3 +522,45 @@ textarea{resize:vertical;font-family:var(--font-body);}
 @media print{
   .timeline{margin:16px 0;}
 }
+
+/* Score de confiance */
+.score-card{
+  display:flex;
+  gap:24px;
+  align-items:center;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:24px;
+  margin-bottom:24px;
+  max-width:640px;
+  flex-wrap:wrap;
+}
+.score-cercle{
+  width:88px;height:88px;
+  border-radius:50%;
+  background:conic-gradient(var(--sage) calc(var(--pct, 0) * 1%), var(--line) 0);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  flex-shrink:0;
+  position:relative;
+}
+.score-cercle::before{
+  content:"";
+  position:absolute;
+  width:68px;height:68px;
+  border-radius:50%;
+  background:#fff;
+}
+.score-cercle span{position:relative;z-index:1;}
+#scoreValeur{font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--navy-deep);}
+.score-sur100{font-size:11px;color:var(--ink-soft);}
+.score-detail{flex:1;min-width:220px;}
+.score-titre{font-weight:600;font-size:14px;margin:0 0 2px;}
+.score-sous-titre{font-size:12px;color:var(--ink-soft);margin:0 0 12px;}
+.score-barres{display:flex;flex-direction:column;gap:6px;}
+.score-ligne{display:flex;justify-content:space-between;font-size:12px;}
+.score-ligne span{color:var(--ink-soft);}
+.score-ligne strong{color:var(--ink);}

@@ -97,6 +97,9 @@
       </div>
       <p class="eyebrow">Certificat vérifié</p>
       <h2 id="vcTitre">—</h2>
+      <div id="vcScoreBloc" class="hidden" style="margin-bottom:20px;">
+        <p class="conseil">🛡️ Score de confiance du créateur de ce dossier : <strong id="vcScoreValeur">—</strong>/100 (<span id="vcScoreDetail"></span>)</p>
+      </div>
       <div id="vcTimeline" class="timeline"></div>
       <dl class="result-grid">
         <div><dt>Type d'accord</dt><dd id="vcType">—</dd></div>
@@ -152,6 +155,9 @@
       <p style="margin-top:16px;font-size:13px;">
         <span id="authBascule1" class="hidden">Pas encore de compte ? <a href="#" id="lienVersInscription">Créez-en un</a></span>
         <span id="authBascule2">Déjà un compte ? <a href="#" id="lienVersConnexion">Connectez-vous</a></span>
+      </p>
+      <p id="lienMdpOublieBloc" style="margin-top:6px;font-size:13px;">
+        <a href="#" id="lienMdpOublie">Mot de passe oublié ?</a>
       </p>
       <button class="btn btn-ghost" id="btnFermerAuth" style="margin-top:10px;">Retour</button>
     </div>
@@ -296,6 +302,22 @@
       <button class="btn btn-primary" id="btnCreerCompteDepuisDossiers">Se connecter / Créer un compte</button>
     </div>
 
+    <div id="scoreCard" class="score-card hidden">
+      <div class="score-cercle">
+        <span id="scoreValeur">—</span>
+        <span class="score-sur100">/100</span>
+      </div>
+      <div class="score-detail">
+        <p class="score-titre">Score de confiance Preuv'</p>
+        <p class="score-sous-titre" id="scoreSousTitre">Pas encore assez de données</p>
+        <div class="score-barres">
+          <div class="score-ligne"><span>Dossiers certifiés</span><strong id="scoreNbDossiers">0</strong></div>
+          <div class="score-ligne"><span>Taux de confirmation par l'autre partie</span><strong id="scoreTauxConfirmation">—</strong></div>
+          <div class="score-ligne"><span>Taux de livraison confirmée</span><strong id="scoreTauxLivraison">—</strong></div>
+        </div>
+      </div>
+    </div>
+
     <div id="listeDossiers" class="dossiers-list hidden">
       <p class="empty">Aucun dossier pour le moment. Créez-en un pour le voir apparaître ici.</p>
     </div>
@@ -305,7 +327,7 @@
 
 <footer class="footer" id="footerNormal">
   <div class="wrap">
-    <p>Preuv' — prototype de démonstration. Ne constitue pas un avis juridique.</p>
+    <p>Preuv' — prototype de démonstration. Ne constitue pas un avis juridique. · <a href="confidentialite.html" style="color:inherit;">Confidentialité &amp; Conditions</a></p>
   </div>
 </footer>
 

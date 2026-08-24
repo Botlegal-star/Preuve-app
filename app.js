@@ -132,6 +132,59 @@ function buildTimelineHTML(dossier){
   `).join('');
 }
 
+// --- Score de confiance ---
+
+function calculerScore(dossiers){
+  const total = dossiers.length;
+  if (total === 0){
+    return { score: 0, total: 0, tauxConfirmation: null, tauxLivraison: null };
+  }
+  const confirmes = dossiers.filter(d => d.confirmation).length;
+  const livres = dossiers.filter(d => d.livraison).length;
+  const tauxConfirmation = confirmes / total;
+  const tauxLivraison = livres / total;
+
+  const pointsActivite = Math.min(total * 5, 30);
+  const pointsConfirmation = Math.round(tauxConfirmation * 40);
+  const pointsLivraison = Math.round(tauxLivraison * 30);
+  const score = Math.min(pointsActivite + pointsConfirmation + pointsLivraison, 100);
+
+  return { score, total, tauxConfirmation, tauxLivraison };
+}
+
+function afficherScoreLocal(stats){
+  const carte = document.getElementById('scoreCard');
+  if (stats.total === 0){
+    carte.classList.add('hidden');
+    return;
+  }
+  carte.classList.remove('hidden');
+  carte.style.setProperty('--pct', stats.score);
+  document.getElementById('scoreValeur').textContent = stats.score;
+  document.getElementById('scoreNbDossiers').textContent = stats.total;
+  document.getElementById('scoreTauxConfirmation').textContent = Math.round(stats.tauxConfirmation * 100) + '%';
+  document.getElementById('scoreTauxLivraison').textContent = Math.round(stats.tauxLivraison * 100) + '%';
+
+  let sousTitre = 'Continuez à certifier et faire confirmer vos accords pour le renforcer.';
+  if (stats.score >= 80) sousTitre = 'Excellent historique — un signal de confiance fort pour vos partenaires.';
+  else if (stats.score >= 50) sousTitre = 'Bon départ — plus vos accords sont confirmés et livrés, plus il grimpe.';
+  document.getElementById('scoreSousTitre').textContent = sousTitre;
+}
+
+async function synchroniserScorePublic(uid, stats){
+  try{
+    await db.collection('users').doc(uid).set({
+      score: stats.score,
+      total: stats.total,
+      tauxConfirmation: stats.tauxConfirmation,
+      tauxLivraison: stats.tauxLivraison,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  }catch(err){
+    console.error('Impossible de synchroniser le score public :', err);
+  }
+}
+
 // --- Authentification ---
 
 let authMode = 'login';
@@ -145,12 +198,14 @@ function afficherAuthPanel(mode){
     document.getElementById('btnAuthValider').textContent = 'Se connecter';
     document.getElementById('authBascule1').classList.remove('hidden');
     document.getElementById('authBascule2').classList.add('hidden');
+    document.getElementById('lienMdpOublieBloc').classList.remove('hidden');
   } else {
     document.getElementById('authTitre').textContent = 'Créer un compte';
     document.getElementById('authSousTitre').textContent = 'Gratuit, en 30 secondes';
     document.getElementById('btnAuthValider').textContent = 'Créer mon compte';
     document.getElementById('authBascule1').classList.add('hidden');
     document.getElementById('authBascule2').classList.remove('hidden');
+    document.getElementById('lienMdpOublieBloc').classList.add('hidden');
   }
   document.getElementById('topbarNormal').style.display = 'none';
   document.getElementById('mainNormal').style.display = 'none';
@@ -171,6 +226,28 @@ document.getElementById('btnCreerCompteDepuisDossiers').addEventListener('click'
 document.getElementById('btnFermerAuth').addEventListener('click', fermerAuthPanel);
 document.getElementById('lienVersInscription').addEventListener('click', (e) => { e.preventDefault(); afficherAuthPanel('signup'); });
 document.getElementById('lienVersConnexion').addEventListener('click', (e) => { e.preventDefault(); afficherAuthPanel('login'); });
+
+document.getElementById('lienMdpOublie').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('authEmail').value.trim();
+  const erreurEl = document.getElementById('authErreur');
+  erreurEl.style.display = 'block';
+
+  if (!email){
+    erreurEl.textContent = "Renseigne d'abord ton adresse e-mail dans le champ ci-dessus, puis reclique sur ce lien.";
+    erreurEl.classList.add('weak');
+    return;
+  }
+
+  try{
+    await auth.sendPasswordResetEmail(email);
+    erreurEl.classList.remove('weak');
+    erreurEl.textContent = `Un e-mail de réinitialisation a été envoyé à ${email}. Vérifie ta boîte de réception (et les spams).`;
+  }catch(err){
+    erreurEl.classList.add('weak');
+    erreurEl.textContent = "Impossible d'envoyer l'e-mail — vérifie que l'adresse est correcte.";
+  }
+});
 
 document.getElementById('authForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -235,6 +312,9 @@ function demarrerEcouteDossiers(uid){
     .onSnapshot((snap) => {
       dossiersCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderDossiers();
+      const stats = calculerScore(dossiersCache);
+      afficherScoreLocal(stats);
+      synchroniserScorePublic(uid, stats);
     }, (err) => {
       console.error('Erreur de synchronisation Firestore :', err);
     });
@@ -531,6 +611,18 @@ async function initVueExterne(){
   }
 
   const dossier = snap.data();
+
+  if (dossier.ownerId){
+    try{
+      const scoreSnap = await db.collection('users').doc(dossier.ownerId).get();
+      if (scoreSnap.exists){
+        const s = scoreSnap.data();
+        document.getElementById('vcScoreBloc').classList.remove('hidden');
+        document.getElementById('vcScoreValeur').textContent = s.score;
+        document.getElementById('vcScoreDetail').textContent = `${s.total} dossier${s.total > 1 ? 's' : ''} certifié${s.total > 1 ? 's' : ''}`;
+      }
+    }catch(err){ /* pas grave si indisponible */ }
+  }
 
   if (dossier.confirmation){
     // Déjà confirmé : certificat en lecture seule
