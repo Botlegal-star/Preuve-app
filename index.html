@@ -374,6 +374,27 @@
   <p class="print-legal print-meta">Document généré le <span id="printDateGen"></span> — preuv-app.github.io</p>
 </div>
 
+<button id="btnOuvrirBot" class="bot-bouton" aria-label="Assistant Preuv'">💬</button>
+
+<div id="botPanel" class="bot-panel hidden">
+  <div class="bot-header">
+    <span>🛡️ Assistant Preuv'</span>
+    <button id="btnFermerBot" class="bot-fermer" aria-label="Fermer">✕</button>
+  </div>
+  <div id="botConversation" class="bot-conversation">
+    <div class="bot-msg bot-msg-bot">Bonjour 👋 Je peux répondre à vos questions sur Preuv' — comment créer un dossier, le score de confiance, la confirmation, etc. Que voulez-vous savoir ?</div>
+    <div class="bot-suggestions">
+      <button class="bot-chip" data-q="Comment créer un dossier ?">Comment créer un dossier ?</button>
+      <button class="bot-chip" data-q="C'est quoi le score de confiance ?">C'est quoi le score de confiance ?</button>
+      <button class="bot-chip" data-q="Est-ce gratuit ?">Est-ce gratuit ?</button>
+    </div>
+  </div>
+  <form id="botForm" class="bot-form">
+    <input type="text" id="botInput" placeholder="Écrivez votre question..." autocomplete="off">
+    <button type="submit" class="bot-envoyer">➤</button>
+  </form>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>

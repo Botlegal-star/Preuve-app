@@ -759,3 +759,102 @@ async function initVueExterne(){
 }
 
 initVueExterne();
+
+// --- Bot FAQ (V1 : réponses à règles, pas encore une IA connectée) ---
+
+const FAQ = [
+  {
+    motsCles: ['créer', 'dossier', 'nouveau', 'commencer', 'démarrer'],
+    reponse: "Pour créer un dossier : connectez-vous (bouton en haut à droite), allez dans « Nouveau dossier », remplissez le titre, le type d'accord, le résumé, puis cliquez sur « Générer la certification ». Un lien à partager avec l'autre partie apparaît ensuite."
+  },
+  {
+    motsCles: ['score', 'confiance', 'trust', 'note', 'réputation'],
+    reponse: "Le score de confiance (sur 100) reflète votre historique sur Preuv' : nombre de dossiers certifiés, taux de confirmation par l'autre partie, et taux de livraison confirmée. Il est visible publiquement dans vos certificats, pour rassurer vos partenaires."
+  },
+  {
+    motsCles: ['gratuit', 'payant', 'prix', 'coût', 'abonnement', 'tarif'],
+    reponse: "Preuv' est actuellement entièrement gratuit, en phase de test. Aucun frais n'est prélevé pour l'instant."
+  },
+  {
+    motsCles: ['confirmer', 'confirmation', 'autre partie', 'deuxième'],
+    reponse: "Après avoir certifié un dossier, un lien apparaît (à envoyer par WhatsApp par exemple). L'autre partie l'ouvre, vérifie les informations, entre son nom et son téléphone, puis clique sur « Je confirme cet accord ». Vous voyez alors la confirmation apparaître automatiquement dans « Mes dossiers »."
+  },
+  {
+    motsCles: ['livraison', 'réception', 'reçu', 'livré'],
+    reponse: "Une fois un dossier confirmé, un bouton « Marquer livré » apparaît dans votre tableau de bord, ou l'autre partie peut confirmer elle-même la réception depuis le lien du certificat."
+  },
+  {
+    motsCles: ['sécurisé', 'sécurité', 'données', 'privé', 'confidentialité', 'vie privée'],
+    reponse: "Vos données sont hébergées sur Firebase (Google Cloud). Le contenu d'un dossier est visible par vous et par toute personne disposant du lien ou du QR code associé. Plus de détails dans notre page Confidentialité & Conditions, en bas de l'accueil."
+  },
+  {
+    motsCles: ['mot de passe', 'oublié', 'connexion', 'connecter'],
+    reponse: "Sur l'écran de connexion, cliquez sur « Mot de passe oublié ? » après avoir renseigné votre e-mail — un lien de réinitialisation vous sera envoyé."
+  },
+  {
+    motsCles: ['qr', 'code', 'scanner', 'vérifier', 'vérification'],
+    reponse: "Chaque dossier certifié génère un QR code. Scanné par n'importe qui, il ouvre un certificat en lecture seule montrant les détails de l'accord, sans avoir besoin de compte Preuv'."
+  },
+  {
+    motsCles: ['vigilance', 'numéro', 'téléphone', 'signal', 'alerte'],
+    reponse: "En renseignant le téléphone de l'autre partie à la création d'un dossier, Preuv' vérifie s'il apparaît dans d'autres dossiers en attente de confirmation ailleurs sur la plateforme — un signal de prudence avant de vous engager."
+  },
+  {
+    motsCles: ['modifier', 'supprimer', 'changer'],
+    reponse: "Dans « Mes dossiers », chaque dossier a des boutons Voir / Modifier / Supprimer. Attention : modifier un dossier régénère une nouvelle empreinte et réinitialise sa confirmation, l'ancienne version restant conservée dans l'historique."
+  },
+  {
+    motsCles: ['pdf', 'exporter', 'imprimer', 'télécharger'],
+    reponse: "Le bouton « Exporter en PDF » sur la carte de résultat génère un document propre et imprimable, avec l'en-tête Preuv' et une mention légale — utile à montrer à un médiateur."
+  },
+  {
+    motsCles: ['juridique', 'légal', 'avocat', 'juriste', 'tribunal', 'litige'],
+    reponse: "Preuv' renforce la valeur probante d'un accord, mais n'est pas un avis juridique et ne garantit pas l'issue d'un litige. Pour un vrai conseil, rapprochez-vous d'un juriste ou d'un médiateur avec votre certificat en main."
+  }
+];
+
+function repondreFAQ(question){
+  const q = question.toLowerCase();
+  let meilleur = null;
+  let meilleurScore = 0;
+  FAQ.forEach(entry => {
+    const score = entry.motsCles.filter(mc => q.includes(mc)).length;
+    if (score > meilleurScore){ meilleurScore = score; meilleur = entry; }
+  });
+  if (meilleur) return meilleur.reponse;
+  return "Je n'ai pas de réponse toute prête pour cette question. Écrivez-nous directement à contact.preuvapp@gmail.com, on vous répond rapidement.";
+}
+
+function ajouterMessageBot(texte, type){
+  const conv = document.getElementById('botConversation');
+  const div = document.createElement('div');
+  div.className = `bot-msg bot-msg-${type}`;
+  div.textContent = texte;
+  conv.appendChild(div);
+  conv.scrollTop = conv.scrollHeight;
+}
+
+document.getElementById('btnOuvrirBot').addEventListener('click', () => {
+  document.getElementById('botPanel').classList.remove('hidden');
+});
+document.getElementById('btnFermerBot').addEventListener('click', () => {
+  document.getElementById('botPanel').classList.add('hidden');
+});
+
+document.querySelectorAll('.bot-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const q = chip.dataset.q;
+    ajouterMessageBot(q, 'user');
+    ajouterMessageBot(repondreFAQ(q), 'bot');
+  });
+});
+
+document.getElementById('botForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('botInput');
+  const q = input.value.trim();
+  if (!q) return;
+  ajouterMessageBot(q, 'user');
+  ajouterMessageBot(repondreFAQ(q), 'bot');
+  input.value = '';
+});
