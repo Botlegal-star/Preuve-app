@@ -689,3 +689,5 @@ textarea{resize:vertical;font-family:var(--font-body);}
   .bot-panel{ width:calc(100vw - 32px); right:16px; bottom:88px; }
   .bot-bouton{ right:16px; bottom:16px; }
 }
+
+.alerte-ok-item{background:rgba(63,107,84,0.08);color:var(--ink);}

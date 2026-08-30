@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Preuv' — Certifiez vos échanges</title>
+<title>Preuv' — Une trace vérifiable pour vos accords</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
 <meta name="description" content="Preuv' capture, horodate et certifie vos accords conclus en ligne — ventes, locations, prêts, services — avec confirmation à deux parties et preuve de livraison.">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Preuv'">
-<meta property="og:title" content="Preuv' — Certifiez vos échanges en ligne">
+<meta property="og:title" content="Preuv' — Donnez une trace vérifiable à vos accords numériques">
 <meta property="og:description" content="Preuve numérique horodatée, double confirmation entre les deux parties, et score de confiance — pour tous vos accords en ligne.">
 <meta property="og:image" content="https://botlegal-star.github.io/Preuve-app/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -18,7 +18,7 @@
 <meta property="og:url" content="https://botlegal-star.github.io/Preuve-app/">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Preuv' — Certifiez vos échanges en ligne">
+<meta name="twitter:title" content="Preuv' — Donnez une trace vérifiable à vos accords numériques">
 <meta name="twitter:description" content="Preuve numérique horodatée, double confirmation entre les deux parties, et score de confiance.">
 <meta name="twitter:image" content="https://botlegal-star.github.io/Preuve-app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,6 +36,7 @@
     <nav class="topnav">
       <button class="nav-link" data-goto="creer">Nouveau dossier</button>
       <button class="nav-link" data-goto="dossiers">Mes dossiers</button>
+      <button class="nav-link" data-goto="verifier">Vérifier un certificat</button>
       <span id="authStatusConnecte" class="auth-status hidden">
         <span id="authEmailAffiche" class="auth-email"></span>
         <button class="nav-link" id="btnDeconnexion">Déconnexion</button>
@@ -185,8 +186,8 @@
   <section class="hero wrap">
     <div class="hero-text">
       <p class="eyebrow">Preuve numérique · Pour tous vos échanges en ligne</p>
-      <h1>Un accord conclu en ligne mérite une preuve aussi soignée qu'un contrat signé.</h1>
-      <p class="lede">Preuv' capture, horodate et certifie l'intégrité de vos échanges — messages, ventes en ligne, contrats électroniques, locations, prêts, services — pour renforcer votre position en cas de désaccord.</p>
+      <h1>Donnez une trace vérifiable à vos accords numériques.</h1>
+      <p class="lede">Preuv' n'invente pas la vérité de votre accord — elle en préserve et en vérifie la trace : horodatage, intégrité, confirmation par les deux parties. De quoi renforcer votre position en cas de désaccord.</p>
       <button class="btn btn-primary" data-goto="creer">Créer mon premier dossier</button>
     </div>
     <div class="hero-visual" aria-hidden="true">
@@ -291,9 +292,11 @@
       <dl class="result-grid">
         <div><dt>Horodatage</dt><dd id="resDate">—</dd></div>
         <div><dt>Empreinte numérique (SHA-256)</dt><dd id="resHash" class="mono">—</dd></div>
-        <div><dt>Force du dossier</dt><dd id="resForce">—</dd></div>
       </dl>
-      <p id="resConseil" class="conseil"></p>
+      <div class="risque-block risque-block-result">
+        <p class="risque-titre">Indice de complétude du dossier — <span id="resForce">—</span></p>
+        <div id="resChecklist" class="risque-panel"></div>
+      </div>
       <div id="resAlertes" class="risque-block risque-block-result hidden">
         <p class="risque-titre">Points de vigilance relevés à la certification</p>
         <div id="resAlertesListe" class="risque-panel"></div>
@@ -348,6 +351,20 @@
     <div id="listeDossiers" class="dossiers-list hidden">
       <p class="empty">Aucun dossier pour le moment. Créez-en un pour le voir apparaître ici.</p>
     </div>
+  </section>
+
+  <section id="verifier" class="panel wrap">
+    <h2>Vérifier un certificat</h2>
+    <p class="panel-sub">Vous avez reçu un code ou un lien Preuv' (par exemple sur un document imprimé) ? Collez-le ci-dessous pour consulter le certificat correspondant.</p>
+
+    <form id="verifierForm" class="form-card" style="max-width:520px;">
+      <label class="field">
+        <span class="field-label">Code ou lien du certificat</span>
+        <input type="text" id="verifierInput" placeholder="Ex. aZ3kP9qLm... ou le lien complet" required>
+      </label>
+      <button type="submit" class="btn btn-primary">Vérifier</button>
+      <p id="verifierErreur" class="conseil weak" style="display:none;"></p>
+    </form>
   </section>
 
 </main>

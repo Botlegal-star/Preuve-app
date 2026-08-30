@@ -48,16 +48,29 @@ async function copyToClipboard(text, btn){
   }
 }
 
-function evaluerForce({ texte, montant, fichier, type }){
-  let score = 0;
-  const manque = [];
-  if (texte && texte.trim().length > 20) score += 2; else manque.push('un résumé détaillé de l\'accord (dates, montants, engagements de chaque partie)');
-  if (fichier) score += 2; else manque.push('une pièce jointe (capture d\'écran, reçu, photo, audio)');
-  if (montant) score += 1; else manque.push('le montant précis concerné');
-  if (type) score += 1;
-  if (score >= 5) return { niveau: 'Solide', manque: [], classe: '' };
-  if (score >= 3) return { niveau: 'Correct — peut être renforcé', manque, classe: '' };
-  return { niveau: 'Incomplet', manque, classe: 'weak' };
+function evaluerForce({ texte, montant, fichier, type, titre }){
+  const t = (texte || '').toLowerCase();
+  const aUneDate = /(\d{1,2}\s*(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)|\d{1,2}\/\d{1,2}|avant le|d'ici|délai|le lendemain|sous \d+ (jour|jours|semaine|semaines))/i.test(t);
+  const aMoyenPaiement = /(mobile money|momo|mtn money|moov money|espèces|especes|cash|virement|chèque|cheque)/i.test(t);
+
+  const items = [
+    { label: 'Titre du dossier renseigné', ok: !!(titre && titre.trim()) },
+    { label: "Type d'accord précisé", ok: !!type },
+    { label: 'Montant renseigné', ok: !!montant },
+    { label: 'Résumé détaillé (au moins 20 caractères)', ok: !!(texte && texte.trim().length > 20) },
+    { label: 'Pièce jointe ajoutée', ok: !!fichier },
+    { label: 'Date ou délai mentionné', ok: aUneDate },
+    { label: 'Moyen de paiement mentionné', ok: aMoyenPaiement }
+  ];
+
+  const nbOk = items.filter(i => i.ok).length;
+  const pourcentage = Math.round((nbOk / items.length) * 100);
+  let niveau = 'Incomplet', classe = 'weak';
+  if (pourcentage >= 85){ niveau = 'Solide'; classe = ''; }
+  else if (pourcentage >= 55){ niveau = 'Correct — peut être renforcé'; classe = ''; }
+
+  const manque = items.filter(i => !i.ok).map(i => i.label);
+  return { niveau, classe, manque, items, pourcentage };
 }
 
 // --- Assistant de détection de risque (V1 : règles, pas encore une IA connectée) ---
@@ -115,6 +128,7 @@ function renderAlertes(container, alertes){
 function buildTimelineHTML(dossier){
   const etapes = [
     { titre: 'Accord créé et certifié', date: dossier.date, fait: true },
+    { titre: "Consulté par l'autre partie", date: dossier.consulteLe || null, fait: !!dossier.consulteLe },
     { titre: 'Confirmé par les deux parties', date: dossier.confirmation ? dossier.confirmation.date : null, fait: !!dossier.confirmation },
     { titre: 'Réception confirmée', date: dossier.livraison ? dossier.livraison.date : null, fait: !!dossier.livraison }
   ];
@@ -414,6 +428,33 @@ function buildDossierLink(id){
   return `${base}?doc=${id}`;
 }
 
+document.getElementById('verifierForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const saisie = document.getElementById('verifierInput').value.trim();
+  const erreurEl = document.getElementById('verifierErreur');
+  erreurEl.style.display = 'none';
+
+  if (!saisie){ return; }
+
+  let id = saisie;
+  // Si la personne a collé un lien complet plutôt qu'un simple code, on extrait l'identifiant
+  try{
+    if (saisie.includes('?doc=')){
+      const url = new URL(saisie, location.origin);
+      id = url.searchParams.get('doc') || saisie;
+    }
+  }catch(e){ /* pas une URL valide, on garde tel quel comme code */ }
+
+  id = id.trim();
+  if (!id){
+    erreurEl.textContent = "Merci de coller un code ou un lien valide.";
+    erreurEl.style.display = 'block';
+    return;
+  }
+
+  location.href = buildDossierLink(id);
+});
+
 // Navigation
 document.querySelectorAll('[data-goto]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -427,17 +468,14 @@ function afficherResultat(dossier){
   document.getElementById('resHash').textContent = dossier.hash;
   document.getElementById('resTimeline').innerHTML = buildTimelineHTML(dossier);
 
-  const force = evaluerForce({ texte: dossier.texte, montant: dossier.montant, fichier: dossier.fichierNom, type: dossier.type });
-  document.getElementById('resForce').textContent = force.niveau;
-
-  const conseilEl = document.getElementById('resConseil');
-  if (force.manque.length){
-    conseilEl.textContent = 'Pour renforcer ce dossier, ajoutez : ' + force.manque.join(', ') + '.';
-    conseilEl.classList.add('weak');
-  } else {
-    conseilEl.textContent = 'Ce dossier contient les éléments essentiels pour servir de preuve en cas de litige.';
-    conseilEl.classList.remove('weak');
-  }
+  const force = evaluerForce({ texte: dossier.texte, montant: dossier.montant, fichier: dossier.fichierNom, type: dossier.type, titre: dossier.titre });
+  document.getElementById('resForce').textContent = `${force.niveau} (${force.pourcentage}%)`;
+  document.getElementById('resChecklist').innerHTML = force.items.map(i => `
+    <div class="alerte-item ${i.ok ? 'alerte-ok-item' : 'alerte-conseil'}">
+      <span class="alerte-icone">${i.ok ? '🟢' : '🔴'}</span>
+      <span>${escapeHtml(i.label)}</span>
+    </div>
+  `).join('');
 
   const alertesBloc = document.getElementById('resAlertes');
   const alertes = dossier.alertes || [];
@@ -731,6 +769,10 @@ async function initVueExterne(){
   document.getElementById('cfTexte').textContent = dossier.texte || 'Non précisé';
   document.getElementById('cfDate').textContent = formatDate(new Date(dossier.date));
   document.getElementById('cfHash').textContent = dossier.hash;
+
+  if (!dossier.consulteLe){
+    db.collection('dossiers').doc(docId).update({ consulteLe: new Date().toISOString() }).catch(() => {});
+  }
 
   document.getElementById('confirmForm').addEventListener('submit', async (e) => {
     e.preventDefault();
