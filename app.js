@@ -15,6 +15,23 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 
+// --- Jeu d'icônes vectorielles (remplace les émojis dans toute l'app) ---
+
+const ICONES = {
+  cadenas: '<svg class="icon-inline" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M7.5 11V7.5a4.5 4.5 0 0 1 9 0V11"/></svg>',
+  bouclier: '<svg class="icon-inline" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg>',
+  recherche: '<svg class="icon-inline" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  colis: '<svg class="icon-inline" viewBox="0 0 24 24"><rect x="3.5" y="8" width="17" height="12" rx="1"/><path d="M3.5 8l8.5-4.5L20.5 8"/><path d="M12 8v12"/></svg>',
+  horloge: '<svg class="icon-inline" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>',
+  alerte: '<svg class="icon-inline" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg>',
+  info: '<svg class="icon-inline" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="8.2" r="1" fill="currentColor" stroke="none"/><path d="M12 11v5"/></svg>',
+  crayon: '<svg class="icon-inline" viewBox="0 0 24 24"><path d="M4 20l1-4 12-12 3 3-12 12z"/><path d="M14 5l3 3"/></svg>',
+  bulle: '<svg class="icon-inline" viewBox="0 0 24 24"><path d="M4 4.5h16v12H8.5L4 20.5z"/></svg>',
+  coche: '<svg class="icon-inline icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9"/></svg>',
+  croix: '<svg class="icon-inline icon-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+  parchemin: '<svg class="icon-inline" viewBox="0 0 24 24"><path d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4"/></svg>'
+};
+
 async function hashText(text){
   const enc = new TextEncoder().encode(text);
   const buf = await crypto.subtle.digest('SHA-256', enc);
@@ -67,7 +84,7 @@ function evaluerForce({ texte, montant, fichier, type, titre }){
   const pourcentage = Math.round((nbOk / items.length) * 100);
   let niveau = 'Incomplet', classe = 'weak';
   if (pourcentage >= 85){ niveau = 'Solide'; classe = ''; }
-  else if (pourcentage >= 55){ niveau = 'Correct — peut être renforcé'; classe = ''; }
+  else if (pourcentage >= 55){ niveau = 'Correct, peut être renforcé'; classe = ''; }
 
   const manque = items.filter(i => !i.ok).map(i => i.label);
   return { niveau, classe, manque, items, pourcentage };
@@ -119,7 +136,7 @@ function renderAlertes(container, alertes){
   }
   container.innerHTML = alertes.map(a => `
     <div class="alerte-item alerte-${a.niveau}">
-      <span class="alerte-icone">${a.niveau === 'alerte' ? '⚠️' : '💡'}</span>
+      <span class="alerte-icone">${a.niveau === 'alerte' ? ICONES.alerte : ICONES.info}</span>
       <span>${escapeHtml(a.message)}</span>
     </div>
   `).join('');
@@ -180,8 +197,8 @@ function afficherScoreLocal(stats){
   document.getElementById('scoreTauxLivraison').textContent = Math.round(stats.tauxLivraison * 100) + '%';
 
   let sousTitre = 'Continuez à certifier et faire confirmer vos accords pour le renforcer.';
-  if (stats.score >= 80) sousTitre = 'Excellent historique — un signal de confiance fort pour vos partenaires.';
-  else if (stats.score >= 50) sousTitre = 'Bon départ — plus vos accords sont confirmés et livrés, plus il grimpe.';
+  if (stats.score >= 80) sousTitre = 'Excellent historique. Un signal de confiance fort pour vos partenaires.';
+  else if (stats.score >= 50) sousTitre = 'Bon départ. Plus vos accords sont confirmés et livrés, plus il grimpe.';
   document.getElementById('scoreSousTitre').textContent = sousTitre;
 }
 
@@ -259,7 +276,7 @@ document.getElementById('lienMdpOublie').addEventListener('click', async (e) => 
     erreurEl.textContent = `Un e-mail de réinitialisation a été envoyé à ${email}. Vérifie ta boîte de réception (et les spams).`;
   }catch(err){
     erreurEl.classList.add('weak');
-    erreurEl.textContent = "Impossible d'envoyer l'e-mail — vérifie que l'adresse est correcte.";
+    erreurEl.textContent = "Impossible d'envoyer l'e-mail, vérifie que l'adresse est correcte.";
   }
 });
 
@@ -279,7 +296,7 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
     fermerAuthPanel();
   }catch(err){
     const messages = {
-      'auth/email-already-in-use': 'Un compte existe déjà avec cet e-mail — essayez de vous connecter.',
+      'auth/email-already-in-use': 'Un compte existe déjà avec cet e-mail, essayez de vous connecter.',
       'auth/invalid-email': 'Adresse e-mail invalide.',
       'auth/weak-password': 'Le mot de passe doit contenir au moins 6 caractères.',
       'auth/wrong-password': 'Mot de passe incorrect.',
@@ -364,14 +381,14 @@ function renderDossiers(){
   list.innerHTML = dossiersCache.map(d => `
     <div class="dossier-item">
       <div class="di-info">
-        <div class="di-title">${escapeHtml(d.titre)} ${d.confirmation ? '<span class="badge-confirme">✓ confirmé</span>' : ''} ${d.livraison ? '<span class="badge-confirme badge-livraison">📦 livré</span>' : ''}</div>
+        <div class="di-title">${escapeHtml(d.titre)} ${d.confirmation ? `<span class="badge-confirme">${ICONES.coche} confirmé</span>` : ''} ${d.livraison ? `<span class="badge-confirme badge-livraison">${ICONES.colis} livré</span>` : ''}</div>
         <div class="di-meta">${escapeHtml(d.type)} · ${formatDate(new Date(d.date))}${d.confirmation ? ` · confirmé par ${escapeHtml(d.confirmation.nom)}` : ''}${d.livraison ? ` · reçu le ${formatDate(new Date(d.livraison.date))}` : ''}</div>
         <div class="di-hash">${d.hash.slice(0,12)}…</div>
       </div>
       <div class="di-actions">
         <button class="di-btn" data-action="voir" data-id="${d.id}">Voir</button>
         <button class="di-btn" data-action="modifier" data-id="${d.id}">Modifier</button>
-        ${d.confirmation && !d.livraison ? `<button class="di-btn" data-action="livraison" data-id="${d.id}">📦 Marquer livré</button>` : ''}
+        ${d.confirmation && !d.livraison ? `<button class="di-btn" data-action="livraison" data-id="${d.id}">${ICONES.colis} Marquer livré</button>` : ''}
         <button class="di-btn di-btn-danger" data-action="supprimer" data-id="${d.id}">Supprimer</button>
       </div>
     </div>
@@ -472,7 +489,7 @@ function afficherResultat(dossier){
   document.getElementById('resForce').textContent = `${force.niveau} (${force.pourcentage}%)`;
   document.getElementById('resChecklist').innerHTML = force.items.map(i => `
     <div class="alerte-item ${i.ok ? 'alerte-ok-item' : 'alerte-conseil'}">
-      <span class="alerte-icone">${i.ok ? '🟢' : '🔴'}</span>
+      <span class="alerte-icone">${i.ok ? ICONES.coche : ICONES.croix}</span>
       <span>${escapeHtml(i.label)}</span>
     </div>
   `).join('');
@@ -492,7 +509,7 @@ function afficherResultat(dossier){
     document.getElementById('resHistoriqueListe').innerHTML = historique.map((v, i) => `
       <div class="alerte-item alerte-conseil">
         <span class="alerte-icone">v${i + 1}</span>
-        <span><strong>${escapeHtml(v.titre)}</strong> — modifié le ${formatDate(new Date(v.date))} · empreinte : <span class="mono">${v.hash.slice(0,16)}…</span></span>
+        <span><strong>${escapeHtml(v.titre)}</strong> · modifié le ${formatDate(new Date(v.date))} · empreinte : <span class="mono">${v.hash.slice(0,16)}…</span></span>
       </div>
     `).join('');
     histoBloc.classList.remove('hidden');
@@ -582,9 +599,9 @@ function afficherVigilance(resultat){
   if (resultat.total === 0){
     contenu.innerHTML = "<p class=\"alerte-ok\">✓ Ce numéro n'apparaît dans aucun autre dossier Preuv'.</p>";
   } else if (resultat.enAttente > 0){
-    contenu.innerHTML = `<div class="alerte-item alerte-alerte"><span class="alerte-icone">⚠️</span><span>Ce numéro apparaît dans <strong>${resultat.enAttente}</strong> autre${resultat.enAttente>1?'s':''} dossier${resultat.enAttente>1?'s':''} Preuv' encore <strong>en attente de confirmation</strong>. Ce n'est pas une preuve de problème, mais ça vaut la peine de vérifier avant de vous engager davantage.</span></div>`;
+    contenu.innerHTML = `<div class="alerte-item alerte-alerte"><span class="alerte-icone">${ICONES.alerte}</span><span>Ce numéro apparaît dans <strong>${resultat.enAttente}</strong> autre${resultat.enAttente>1?'s':''} dossier${resultat.enAttente>1?'s':''} Preuv' encore <strong>en attente de confirmation</strong>. Ce n'est pas une preuve de problème, mais ça vaut la peine de vérifier avant de vous engager davantage.</span></div>`;
   } else {
-    contenu.innerHTML = `<p class="alerte-ok">Ce numéro apparaît dans ${resultat.total} autre${resultat.total>1?'s':''} dossier${resultat.total>1?'s':''} Preuv', tous déjà confirmés — plutôt rassurant.</p>`;
+    contenu.innerHTML = `<p class="alerte-ok">Ce numéro apparaît dans ${resultat.total} autre${resultat.total>1?'s':''} dossier${resultat.total>1?'s':''} Preuv', tous déjà confirmés. Plutôt rassurant.</p>`;
   }
 }
 
@@ -729,7 +746,7 @@ async function initVueExterne(){
       document.getElementById('vcHistoriqueListe').innerHTML = dossier.historique.map((v, i) => `
         <div class="alerte-item alerte-conseil">
           <span class="alerte-icone">v${i + 1}</span>
-          <span><strong>${escapeHtml(v.titre)}</strong> — version antérieure du ${formatDate(new Date(v.date))} · empreinte : <span class="mono">${v.hash.slice(0,16)}…</span></span>
+          <span><strong>${escapeHtml(v.titre)}</strong> · version antérieure du ${formatDate(new Date(v.date))} · empreinte : <span class="mono">${v.hash.slice(0,16)}…</span></span>
         </div>
       `).join('');
       document.getElementById('vcHistorique').classList.remove('hidden');
@@ -753,7 +770,7 @@ async function initVueExterne(){
           document.getElementById('vcLivraisonDate').textContent = formatDate(new Date());
         }catch(err){
           e.target.disabled = false;
-          e.target.textContent = '📦 Je confirme avoir reçu ceci';
+          e.target.textContent = 'Je confirme avoir reçu ceci';
           alert("La confirmation de réception n'a pas pu être enregistrée. Réessayez.");
         }
       });
@@ -802,6 +819,28 @@ async function initVueExterne(){
 
 initVueExterne();
 
+// Petite animation d'ambiance : l'empreinte du hero semble "se calculer"
+(function animerHashHero(){
+  const el = document.getElementById('heroHash');
+  if (!el) return;
+  const cible = '8f3a\u2026c02e';
+  const chars = '0123456789abcdef';
+  let frame = 0;
+  const total = 14;
+  const tick = setInterval(() => {
+    frame++;
+    if (frame >= total){
+      el.textContent = cible;
+      clearInterval(tick);
+      return;
+    }
+    el.textContent = Array.from({ length: 9 }, (_, i) => {
+      if (i === 4) return '\u2026';
+      return chars[Math.floor(Math.random() * chars.length)];
+    }).join('');
+  }, 70);
+})();
+
 // --- Bot FAQ (V1 : réponses à règles, pas encore une IA connectée) ---
 
 const FAQ = [
@@ -831,7 +870,7 @@ const FAQ = [
   },
   {
     motsCles: ['mot de passe', 'oublié', 'connexion', 'connecter'],
-    reponse: "Sur l'écran de connexion, cliquez sur « Mot de passe oublié ? » après avoir renseigné votre e-mail — un lien de réinitialisation vous sera envoyé."
+    reponse: "Sur l'écran de connexion, cliquez sur « Mot de passe oublié ? » après avoir renseigné votre e-mail. Un lien de réinitialisation vous sera envoyé."
   },
   {
     motsCles: ['qr', 'code', 'scanner', 'vérifier', 'vérification'],
@@ -839,7 +878,7 @@ const FAQ = [
   },
   {
     motsCles: ['vigilance', 'numéro', 'téléphone', 'signal', 'alerte'],
-    reponse: "En renseignant le téléphone de l'autre partie à la création d'un dossier, Preuv' vérifie s'il apparaît dans d'autres dossiers en attente de confirmation ailleurs sur la plateforme — un signal de prudence avant de vous engager."
+    reponse: "En renseignant le téléphone de l'autre partie à la création d'un dossier, Preuv' vérifie s'il apparaît dans d'autres dossiers en attente de confirmation ailleurs sur la plateforme. Un signal de prudence avant de vous engager."
   },
   {
     motsCles: ['modifier', 'supprimer', 'changer'],
@@ -847,7 +886,7 @@ const FAQ = [
   },
   {
     motsCles: ['pdf', 'exporter', 'imprimer', 'télécharger'],
-    reponse: "Le bouton « Exporter en PDF » sur la carte de résultat génère un document propre et imprimable, avec l'en-tête Preuv' et une mention légale — utile à montrer à un médiateur."
+    reponse: "Le bouton « Exporter en PDF » sur la carte de résultat génère un document propre et imprimable, avec l'en-tête Preuv' et une mention légale, utile à montrer à un médiateur."
   },
   {
     motsCles: ['juridique', 'légal', 'avocat', 'juriste', 'tribunal', 'litige'],

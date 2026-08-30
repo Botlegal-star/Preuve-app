@@ -6,12 +6,12 @@
 <title>Preuv' — Une trace vérifiable pour vos accords</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
-<meta name="description" content="Preuv' capture, horodate et certifie vos accords conclus en ligne — ventes, locations, prêts, services — avec confirmation à deux parties et preuve de livraison.">
+<meta name="description" content="Preuv' capture, horodate et certifie vos accords conclus en ligne : ventes, locations, prêts, services, avec confirmation à deux parties et preuve de livraison.">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Preuv'">
 <meta property="og:title" content="Preuv' — Donnez une trace vérifiable à vos accords numériques">
-<meta property="og:description" content="Preuve numérique horodatée, double confirmation entre les deux parties, et score de confiance — pour tous vos accords en ligne.">
+<meta property="og:description" content="Preuve numérique horodatée, double confirmation entre les deux parties, et score de confiance : pour tous vos accords en ligne.">
 <meta property="og:image" content="https://botlegal-star.github.io/Preuve-app/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -89,7 +89,7 @@
         </div>
       </div>
       <h3>Confirmation enregistrée ✓</h3>
-      <p class="conseil">C'est fait ! La personne qui a créé ce dossier verra automatiquement votre confirmation apparaître de son côté — vous n'avez rien d'autre à faire.</p>
+      <p class="conseil">C'est fait ! La personne qui a créé ce dossier verra automatiquement votre confirmation apparaître de son côté. Vous n'avez rien d'autre à faire.</p>
       <button class="btn btn-ghost" id="btnImprimerConfirm">Exporter en PDF</button>
     </div>
   </div>
@@ -115,7 +115,7 @@
       <p class="eyebrow">Certificat vérifié</p>
       <h2 id="vcTitre">—</h2>
       <div id="vcScoreBloc" class="hidden" style="margin-bottom:20px;">
-        <p class="conseil">🛡️ Score de confiance du créateur de ce dossier : <strong id="vcScoreValeur">—</strong>/100 (<span id="vcScoreDetail"></span>)</p>
+        <p class="conseil"><svg class="icon-inline" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg> Score de confiance du créateur de ce dossier : <strong id="vcScoreValeur">—</strong>/100 (<span id="vcScoreDetail"></span>)</p>
       </div>
       <div id="vcTimeline" class="timeline"></div>
       <dl class="result-grid">
@@ -129,20 +129,20 @@
         <p class="conseil">✓ Ce dossier a également été confirmé par une deuxième partie : <span id="vcConfirmeParNom"></span>, le <span id="vcConfirmeDate"></span>.</p>
       </div>
       <div id="vcLivraisonBloc" class="hidden">
-        <p class="conseil">📦 Réception confirmée le <span id="vcLivraisonDate"></span>.</p>
+        <p class="conseil"><svg class="icon-inline" viewBox="0 0 24 24"><rect x="3.5" y="8" width="17" height="12" rx="1"/><path d="M3.5 8l8.5-4.5L20.5 8"/><path d="M12 8v12"/></svg> Réception confirmée le <span id="vcLivraisonDate"></span>.</p>
       </div>
       <div id="vcLivraisonAction" class="hidden" style="margin:16px 0;">
         <p style="font-size:13px;color:var(--ink-soft);margin-bottom:10px;">Si vous avez reçu le bien ou le service décrit ci-dessus, conformément à l'accord :</p>
-        <button class="btn btn-primary" id="btnConfirmerLivraison">📦 Je confirme avoir reçu ceci</button>
+        <button class="btn btn-primary" id="btnConfirmerLivraison"><svg class="icon-inline" viewBox="0 0 24 24"><rect x="3.5" y="8" width="17" height="12" rx="1"/><path d="M3.5 8l8.5-4.5L20.5 8"/><path d="M12 8v12"/></svg> Je confirme avoir reçu ceci</button>
       </div>
       <div id="vcHistorique" class="risque-block hidden" style="text-align:left;margin:16px 0;">
-        <p class="risque-titre">📜 Ce dossier a été modifié depuis sa création — historique :</p>
+        <p class="risque-titre"><svg class="icon-inline" viewBox="0 0 24 24"><path d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4"/></svg> Ce dossier a été modifié depuis sa création. Historique :</p>
         <div id="vcHistoriqueListe" class="risque-panel"></div>
       </div>
       <p class="print-legal" style="margin-top:20px;">Ce certificat a été généré par Preuv' et reflète les informations telles que déclarées et horodatées par son créateur. Preuv' ne constitue pas un avis juridique.</p>
     </div>
     <div class="confirm-card hidden" id="vcCarteInvalide">
-      <h3>⚠️ Ce lien ne correspond à aucun dossier valide</h3>
+      <h3><svg class="icon-inline" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg> Ce lien ne correspond à aucun dossier valide</h3>
       <p class="conseil weak">Le lien semble corrompu, expiré, ou le dossier a été supprimé. Redemandez un nouveau lien à la personne concernée.</p>
     </div>
   </div>
@@ -187,7 +187,7 @@
     <div class="hero-text">
       <p class="eyebrow">Preuve numérique · Pour tous vos échanges en ligne</p>
       <h1>Donnez une trace vérifiable à vos accords numériques.</h1>
-      <p class="lede">Preuv' n'invente pas la vérité de votre accord — elle en préserve et en vérifie la trace : horodatage, intégrité, confirmation par les deux parties. De quoi renforcer votre position en cas de désaccord.</p>
+      <p class="lede">Preuv' n'invente pas la vérité de votre accord : elle en préserve et en vérifie la trace : horodatage, intégrité, confirmation par les deux parties. De quoi renforcer votre position en cas de désaccord.</p>
       <button class="btn btn-primary" data-goto="creer">Créer mon premier dossier</button>
     </div>
     <div class="hero-visual" aria-hidden="true">
@@ -195,7 +195,7 @@
         <div class="doc-line w-70"></div>
         <div class="doc-line w-90"></div>
         <div class="doc-line w-40"></div>
-        <div class="doc-hash">8f3a…c02e</div>
+        <div class="doc-hash" id="heroHash">8f3a…c02e</div>
         <div class="seal" id="heroSeal">
           <svg viewBox="0 0 100 100" class="seal-svg">
             <circle cx="50" cy="50" r="46" />
@@ -208,22 +208,72 @@
     </div>
   </section>
 
+  <section id="apercu" class="panel wrap">
+    <h2>Ce que vous obtenez</h2>
+    <p class="panel-sub">Un aperçu réel du certificat généré par Preuv' pour chaque dossier.</p>
+
+    <div class="result-card apercu-card" style="max-width:560px;">
+      <div class="result-seal-wrap">
+        <div class="seal seal-small">
+          <svg viewBox="0 0 100 100" class="seal-svg">
+            <circle cx="50" cy="50" r="46" />
+            <circle cx="50" cy="50" r="38" />
+            <text x="50" y="46" text-anchor="middle" class="seal-text">CERTIFIÉ</text>
+            <text x="50" y="62" text-anchor="middle" class="seal-text seal-text-sm">PREUV'</text>
+          </svg>
+        </div>
+      </div>
+      <h3>Vente de 3 sacs de riz à M. Adjovi</h3>
+
+      <div class="timeline">
+        <div class="timeline-step done">
+          <div class="timeline-marker"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+          <div class="timeline-content"><div class="timeline-title">✓ Accord créé et certifié</div><div class="timeline-date">9 août 2026 à 21:43</div></div>
+        </div>
+        <div class="timeline-step done">
+          <div class="timeline-marker"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+          <div class="timeline-content"><div class="timeline-title">✓ Consulté par l'autre partie</div><div class="timeline-date">9 août 2026 à 21:51</div></div>
+        </div>
+        <div class="timeline-step done">
+          <div class="timeline-marker"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+          <div class="timeline-content"><div class="timeline-title">✓ Confirmé par les deux parties</div><div class="timeline-date">9 août 2026 à 21:53</div></div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-marker"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+          <div class="timeline-content"><div class="timeline-title">○ Réception confirmée</div><div class="timeline-date">En attente</div></div>
+        </div>
+      </div>
+
+      <dl class="result-grid">
+        <div><dt>Empreinte numérique (SHA-256)</dt><dd class="mono apercu-hash">2d583e939dd2492eb6253f9a688fa7981acb7510353444862e403a8740ea4315</dd></div>
+      </dl>
+
+      <div class="risque-block risque-block-result">
+        <p class="risque-titre">Indice de complétude du dossier : Solide (86%)</p>
+        <div class="risque-panel">
+          <div class="alerte-item alerte-ok-item"><span class="alerte-icone"><svg class="icon-inline icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9"/></svg></span><span>Résumé détaillé et montant renseigné</span></div>
+          <div class="alerte-item alerte-ok-item"><span class="alerte-icone"><svg class="icon-inline icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9"/></svg></span><span>Moyen de paiement précisé (Mobile Money)</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="creer" class="panel wrap">
     <h2>Nouveau dossier</h2>
-    <p class="panel-sub">Décrivez l'accord, puis ajoutez ce qui en fait la preuve — une capture, un reçu, une note vocale, ou simplement le texte de l'échange.</p>
+    <p class="panel-sub">Décrivez l'accord, puis ajoutez ce qui en fait la preuve : une capture, un reçu, une note vocale, ou simplement le texte de l'échange.</p>
 
     <div id="creerVerrou" class="form-card" style="text-align:center;">
-      <p class="conseil">🔒 Un compte gratuit est nécessaire pour créer et conserver vos dossiers en ligne, sur tous vos appareils.</p>
+      <p class="conseil"><svg class="icon-inline" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M7.5 11V7.5a4.5 4.5 0 0 1 9 0V11"/></svg> Un compte gratuit est nécessaire pour créer et conserver vos dossiers en ligne, sur tous vos appareils.</p>
       <button class="btn btn-primary" id="btnCreerCompteDepuisCreer">Créer un compte gratuit</button>
     </div>
 
     <div id="creerProtege" class="hidden">
-    <p id="editNotice" class="edit-notice hidden">✏️ Vous modifiez un dossier existant — comme le contenu change, une nouvelle empreinte et un nouvel horodatage seront générés, et toute confirmation déjà reçue sera réinitialisée.</p>
+    <p id="editNotice" class="edit-notice hidden"><svg class="icon-inline" viewBox="0 0 24 24"><path d="M4 20l1-4 12-12 3 3-12 12z"/><path d="M14 5l3 3"/></svg> Vous modifiez un dossier existant. Comme le contenu change, une nouvelle empreinte et un nouvel horodatage seront générés, et toute confirmation déjà reçue sera réinitialisée.</p>
 
     <form id="dossierForm" class="form-card">
       <label class="field">
         <span class="field-label">Titre du dossier</span>
-        <input type="text" id="titre" placeholder="Ex. Vente de 2 sacs de riz — M. Koudjo" required>
+        <input type="text" id="titre" placeholder="Ex. Vente de 2 sacs de riz à M. Koudjo" required>
       </label>
 
       <div class="field-row">
@@ -246,11 +296,11 @@
       <label class="field">
         <span class="field-label">Téléphone de l'autre partie (optionnel)</span>
         <input type="text" id="autrePartieTel" placeholder="Ex. 97 00 00 00">
-        <span style="font-size:11px;color:var(--ink-soft);">Permet de vérifier si ce numéro apparaît dans d'autres dossiers Preuv' en attente — un signal de vigilance utile avant de vous engager.</span>
+        <span style="font-size:11px;color:var(--ink-soft);">Permet de vérifier si ce numéro apparaît dans d'autres dossiers Preuv' en attente. Un signal de vigilance utile avant de vous engager.</span>
       </label>
 
       <div id="vigilanceBloc" class="risque-block hidden">
-        <p class="risque-titre">🛡️ Vigilance croisée</p>
+        <p class="risque-titre"><svg class="icon-inline" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg> Vigilance croisée</p>
         <div id="vigilanceContenu" class="risque-panel"></div>
       </div>
 
@@ -260,7 +310,7 @@
       </label>
 
       <div class="risque-block">
-        <p class="risque-titre">🔎 Assistant Preuv' — points à vérifier</p>
+        <p class="risque-titre"><svg class="icon-inline" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Assistant Preuv'. Points à vérifier</p>
         <div id="analyseRisques" class="risque-panel">
           <p class="alerte-ok">Commencez à décrire l'accord pour voir l'analyse.</p>
         </div>
@@ -294,7 +344,7 @@
         <div><dt>Empreinte numérique (SHA-256)</dt><dd id="resHash" class="mono">—</dd></div>
       </dl>
       <div class="risque-block risque-block-result">
-        <p class="risque-titre">Indice de complétude du dossier — <span id="resForce">—</span></p>
+        <p class="risque-titre">Indice de complétude du dossier : <span id="resForce">—</span></p>
         <div id="resChecklist" class="risque-panel"></div>
       </div>
       <div id="resAlertes" class="risque-block risque-block-result hidden">
@@ -302,7 +352,7 @@
         <div id="resAlertesListe" class="risque-panel"></div>
       </div>
       <div id="resHistorique" class="risque-block risque-block-result hidden">
-        <p class="risque-titre">📜 Historique des versions — rien n'est jamais effacé</p>
+        <p class="risque-titre"><svg class="icon-inline" viewBox="0 0 24 24"><path d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4"/></svg> Historique des versions. Rien n'est jamais effacé</p>
         <div id="resHistoriqueListe" class="risque-panel"></div>
       </div>
       <div class="share-block">
@@ -312,7 +362,7 @@
           <input type="text" id="shareLink" class="share-input" readonly>
           <button class="btn btn-ghost btn-small" id="btnCopierLien">Copier le lien</button>
         </div>
-        <p class="share-hint">L'autre partie ouvre ce lien, vérifie les détails, et confirme l'accord de son côté — ça crée une preuve à deux, bien plus solide qu'un dossier créé seul.</p>
+        <p class="share-hint">L'autre partie ouvre ce lien, vérifie les détails, et confirme l'accord de son côté. Ça crée une preuve à deux, bien plus solide qu'un dossier créé seul.</p>
       </div>
 
       <div class="result-actions">
@@ -328,7 +378,7 @@
     <p class="panel-sub">Synchronisés sur tous vos appareils une fois connecté.</p>
 
     <div id="dossiersVerrou" class="form-card" style="text-align:center;">
-      <p class="conseil">🔒 Connectez-vous pour voir vos dossiers.</p>
+      <p class="conseil"><svg class="icon-inline" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M7.5 11V7.5a4.5 4.5 0 0 1 9 0V11"/></svg> Connectez-vous pour voir vos dossiers.</p>
       <button class="btn btn-primary" id="btnCreerCompteDepuisDossiers">Se connecter / Créer un compte</button>
     </div>
 
@@ -371,7 +421,7 @@
 
 <footer class="footer" id="footerNormal">
   <div class="wrap">
-    <p>Preuv' — prototype de démonstration. Ne constitue pas un avis juridique. · <a href="confidentialite.html" style="color:inherit;">Confidentialité &amp; Conditions</a></p>
+    <p>Preuv'. Prototype de démonstration, ne constitue pas un avis juridique. · <a href="confidentialite.html" style="color:inherit;">Confidentialité &amp; Conditions</a></p>
   </div>
 </footer>
 
@@ -388,18 +438,18 @@
 <div id="printFooter" class="print-only">
   <hr class="print-hr">
   <p class="print-legal">Ce document atteste de l'existence et de l'intégrité horodatée des informations décrites ci-dessus, telles qu'enregistrées par Preuv' à la date indiquée. Preuv' est un service de certification technique et ne constitue pas un avis juridique ; il ne garantit pas, à lui seul, la validité juridique de l'accord sous-jacent.</p>
-  <p class="print-legal print-meta">Document généré le <span id="printDateGen"></span> — preuv-app.github.io</p>
+  <p class="print-legal print-meta">Document généré le <span id="printDateGen"></span> · preuv-app.github.io</p>
 </div>
 
-<button id="btnOuvrirBot" class="bot-bouton" aria-label="Assistant Preuv'">💬</button>
+<button id="btnOuvrirBot" class="bot-bouton" aria-label="Assistant Preuv'"><svg class="icon-inline" style="width:1.4em;height:1.4em;" viewBox="0 0 24 24"><path d="M4 4.5h16v12H8.5L4 20.5z"/></svg></button>
 
 <div id="botPanel" class="bot-panel hidden">
   <div class="bot-header">
-    <span>🛡️ Assistant Preuv'</span>
+    <span><svg class="icon-inline" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg> Assistant Preuv'</span>
     <button id="btnFermerBot" class="bot-fermer" aria-label="Fermer">✕</button>
   </div>
   <div id="botConversation" class="bot-conversation">
-    <div class="bot-msg bot-msg-bot">Bonjour 👋 Je peux répondre à vos questions sur Preuv' — comment créer un dossier, le score de confiance, la confirmation, etc. Que voulez-vous savoir ?</div>
+    <div class="bot-msg bot-msg-bot">Bonjour ! Je peux répondre à vos questions sur Preuv' : comment créer un dossier, le score de confiance, la confirmation, etc. Que voulez-vous savoir ?</div>
     <div class="bot-suggestions">
       <button class="bot-chip" data-q="Comment créer un dossier ?">Comment créer un dossier ?</button>
       <button class="bot-chip" data-q="C'est quoi le score de confiance ?">C'est quoi le score de confiance ?</button>

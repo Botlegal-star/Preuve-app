@@ -690,4 +690,13 @@ textarea{resize:vertical;font-family:var(--font-body);}
   .bot-bouton{ right:16px; bottom:16px; }
 }
 
+.icon-inline{width:1.05em;height:1.05em;vertical-align:-0.18em;display:inline-block;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.icon-check-circle{color:var(--sage);}
+.icon-x-circle{color:var(--rust);}
+
 .alerte-ok-item{background:rgba(63,107,84,0.08);color:var(--ink);}
+
+/* Section aperçu produit sur la page d'accueil */
+#apercu{background:linear-gradient(180deg, #fff 0%, var(--paper) 100%);}
+.apercu-card{margin:0 auto;box-shadow:0 30px 60px -30px rgba(16,26,48,0.35);}
+.apercu-hash{word-break:break-all;font-size:11px;}
