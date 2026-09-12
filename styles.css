@@ -744,3 +744,29 @@ textarea{resize:vertical;font-family:var(--font-body);}
     animation:none !important; transition:none !important;
   }
 }
+
+/* Tableau de comparaison Capture vs Preuv' */
+.comp-table{
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  background:#fff;
+  max-width:920px;
+}
+.comp-row{
+  display:grid;
+  grid-template-columns:1.1fr 1.4fr 1.4fr;
+  border-top:1px solid var(--line);
+}
+.comp-row:first-child{border-top:none;}
+.comp-row-head{background:var(--navy);}
+.comp-cell{padding:16px 18px;font-size:13.5px;line-height:1.5;display:flex;align-items:center;gap:8px;}
+.comp-cell-label{font-weight:600;font-size:13px;color:var(--ink);background:var(--paper);}
+.comp-cell-head{color:#fff;font-weight:600;font-size:14px;}
+.comp-cell-head-preuv{background:var(--brass);color:var(--navy-deep);}
+.comp-cell-preuv{background:rgba(63,107,84,0.06);}
+
+@media (max-width:760px){
+  .comp-row{grid-template-columns:1fr;}
+  .comp-cell-label{border-bottom:1px dashed var(--line);}
+}
