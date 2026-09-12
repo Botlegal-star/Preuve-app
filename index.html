@@ -221,6 +221,12 @@
     <h2>Ce que vous obtenez</h2>
     <p class="panel-sub">Un aperçu réel du certificat généré par Preuv' pour chaque dossier.</p>
 
+    <div class="apercu-puces">
+      <div class="apercu-puce"><svg class="icon-inline icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9"/></svg> Accord confirmé à deux</div>
+      <div class="apercu-puce"><svg class="icon-inline icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9"/></svg> Horodaté et vérifiable</div>
+      <div class="apercu-puce"><svg class="icon-inline icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9"/></svg> Vérifié par QR code</div>
+    </div>
+
     <div class="result-card apercu-card" style="max-width:560px;">
       <div class="result-seal-wrap">
         <div class="seal seal-small">
@@ -457,16 +463,31 @@
 
   <section id="verifier" class="panel wrap">
     <h2>Vérifier un certificat</h2>
-    <p class="panel-sub">Vous avez reçu un code ou un lien Preuv' (par exemple sur un document imprimé) ? Collez-le ci-dessous pour consulter le certificat correspondant.</p>
+    <p class="panel-sub">Vous avez reçu un code ou un lien Preuv' (par exemple sur un document imprimé) ? Collez-le pour consulter le certificat correspondant.</p>
 
-    <form id="verifierForm" class="form-card" style="max-width:520px;">
-      <label class="field">
-        <span class="field-label">Code ou lien du certificat</span>
-        <input type="text" id="verifierInput" placeholder="Ex. aZ3kP9qLm... ou le lien complet" required>
-      </label>
-      <button type="submit" class="btn btn-primary">Vérifier</button>
-      <p id="verifierErreur" class="conseil weak" style="display:none;"></p>
-    </form>
+    <div class="verifier-grille">
+      <form id="verifierForm" class="form-card">
+        <label class="field">
+          <span class="field-label">Code ou lien du certificat</span>
+          <input type="text" id="verifierInput" placeholder="Ex. aZ3kP9qLm... ou le lien complet" required>
+        </label>
+        <button type="submit" class="btn btn-primary">Vérifier</button>
+        <p id="verifierErreur" class="conseil weak" style="display:none;"></p>
+      </form>
+
+      <div class="verifier-exemple">
+        <div class="verifier-exemple-entete">
+          <svg class="icon-inline icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9"/></svg>
+          Certificat authentique
+        </div>
+        <dl class="result-grid">
+          <div><dt>Code</dt><dd class="mono">aZ3kP9qLm7…</dd></div>
+          <div><dt>Horodatage</dt><dd>12 septembre 2026 à 14:32</dd></div>
+          <div><dt>Intégrité</dt><dd>Vérifiée</dd></div>
+        </dl>
+        <p class="verifier-exemple-note">C'est ce que vous obtiendrez : un certificat lisible par n'importe qui, sans avoir besoin de créer de compte.</p>
+      </div>
+    </div>
   </section>
 
 </main>
