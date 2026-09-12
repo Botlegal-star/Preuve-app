@@ -860,6 +860,10 @@ setTimeout(() => {
 
 const FAQ = [
   {
+    motsCles: ['comment ça marche', 'fonctionne', 'fonctionnement', 'étapes', 'principe', 'utilité', 'sert à quoi'],
+    reponse: "Preuv' vous permet de certifier un accord conclu en ligne (vente, location, prêt, service) : vous décrivez l'accord, l'autre partie le confirme depuis son téléphone, et vous obtenez un dossier horodaté et vérifiable, utile en cas de désaccord."
+  },
+  {
     motsCles: ['créer', 'dossier', 'nouveau', 'commencer', 'démarrer'],
     reponse: "Pour créer un dossier : connectez-vous (bouton en haut à droite), allez dans « Nouveau dossier », remplissez le titre, le type d'accord, le résumé, puis cliquez sur « Générer la certification ». Un lien à partager avec l'autre partie apparaît ensuite."
   },
@@ -880,7 +884,7 @@ const FAQ = [
     reponse: "Une fois un dossier confirmé, un bouton « Marquer livré » apparaît dans votre tableau de bord, ou l'autre partie peut confirmer elle-même la réception depuis le lien du certificat."
   },
   {
-    motsCles: ['sécurisé', 'sécurité', 'données', 'privé', 'confidentialité', 'vie privée'],
+    motsCles: ['sécurisé', 'sécurité', 'données', 'privé', 'confidentialité', 'vie privée', 'stocké', 'stockées', 'stockage', 'infos', 'informations', 'hébergé', 'hébergées', 'serveur', 'où sont'],
     reponse: "Vos données sont hébergées sur Firebase (Google Cloud). Le contenu d'un dossier est visible par vous et par toute personne disposant du lien ou du QR code associé. Plus de détails dans notre page Confidentialité & Conditions, en bas de l'accueil."
   },
   {
