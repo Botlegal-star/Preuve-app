@@ -331,6 +331,12 @@ auth.onAuthStateChanged((user) => {
     dossiersCache = [];
     if (unsubscribeDossiers){ unsubscribeDossiers(); unsubscribeDossiers = null; }
   }
+
+  const loader = document.getElementById('loaderInitial');
+  if (loader){
+    loader.classList.add('loader-cache');
+    setTimeout(() => loader.remove(), 450);
+  }
 });
 
 // --- Dossiers (Firestore) ---
@@ -818,6 +824,15 @@ async function initVueExterne(){
 }
 
 initVueExterne();
+
+// Filet de sécurité : ne jamais laisser l'écran de chargement bloqué plus de 4s
+setTimeout(() => {
+  const loader = document.getElementById('loaderInitial');
+  if (loader){
+    loader.classList.add('loader-cache');
+    setTimeout(() => loader.remove(), 450);
+  }
+}, 4000);
 
 // Petite animation d'ambiance : l'empreinte du hero semble "se calculer"
 (function animerHashHero(){
